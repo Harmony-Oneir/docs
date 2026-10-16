@@ -32,5 +32,5 @@ bash build/prebuilts_download.sh
 
 Перед сборкой положите описания продуктов из [common/products/oneir.json](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/) в каталог `productdefine/common/products/`. Значение из `product_name` используется в следующей команде:
 ```
-./build.sh --product-name <name> --skip-partlist-check --build-only-load
+./build.sh --product-name <name> --no-prebuilt-sdk --skip-partlist-check --build-only-load
 ```
