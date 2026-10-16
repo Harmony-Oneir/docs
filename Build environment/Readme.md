@@ -28,7 +28,7 @@ docker exec -it ohos-build /bin/bash
 bash build/prebuilts_download.sh
 ```
 
-# Подготовка описания продукта
+# Подготовка описаний продуктов
 
 Перед сборкой положите описания продуктов из [common/products/oneir.json](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/) в каталог `productdefine/common/products/`. Значение из `product_name` используется в следующей команде:
 ```
