@@ -34,3 +34,12 @@ bash build/prebuilts_download.sh
 ```
 ./build.sh --product-name <name> --no-prebuilt-sdk --skip-partlist-check --build-only-load
 ```
+Имя продукта нужно добавить в белый список сборки в файле `build/subsystem_components_whitelist.json`:
+
+```
+{
+[...]
+  "product_oneir": "product_oneir",
+[...]
+}
+```
