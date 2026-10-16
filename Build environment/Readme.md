@@ -30,7 +30,7 @@ bash build/prebuilts_download.sh
 
 # Подготовка описания продукта
 
-Перед сборкой положите описания продуктов из [common/products/]([common/products/oneir.json](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/) в каталог `productdefine/common/products/`. Значение из `product_name` используется в следующей команде:
+Перед сборкой положите описания продуктов из [common/products/oneir.json](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/) в каталог `productdefine/common/products/`. Значение из `product_name` используется в следующей команде:
 ```
 ./build.sh --product-name <name> --skip-partlist-check --build-only-load
 ```
