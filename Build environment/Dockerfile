@@ -61,6 +61,7 @@ RUN set -xe \
     && npm install -g @ohos/hpm-cli --registry https://mirrors.huaweicloud.com/repository/npm/
 
 RUN pip3 install pyyaml
+RUN apt-get update && apt-get install -y autoconf automake libtool libtool-bin autopoint pkg-config
 
 # Шаг 5: Переменные окружения по умолчанию
 ENV LANG=en_US.UTF-8 \
