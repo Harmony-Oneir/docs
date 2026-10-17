@@ -60,6 +60,8 @@ RUN set -xe \
     # Установка hpm-cli через npm
     && npm install -g @ohos/hpm-cli --registry https://mirrors.huaweicloud.com/repository/npm/
 
+RUN pip3 install pyyaml
+
 # Шаг 5: Переменные окружения по умолчанию
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
