@@ -43,3 +43,14 @@ typedef enum ATypeEnum {
 ```
 ./make.sh atm
 ```
+Результат сборки лежит по пути `out/oneir/security/access_token/`:
+
+| Библиотека | Назначение |
+| --- | :--- | 
+| libaccesstoken_manager_service.z.so | сам ATM (SA 3503), его загружает sa_main | 
+| libaccesstoken_json_parse.z.so, libaccesstoken_cjson_utils.z.so | разбор nativetoken.json и профилей прав |
+| libaccesstoken_common_cxx.z.so, libaccesstoken_communication_adapter_cxx.z.so| общий код и (де)сериализация для IPC |
+| libaccesstoken_sdk.z.so | клиентская библиотека: через неё другие процессы вызывают ATM (VerifyAccessToken и т.п.) |
+| libtokenid_sdk.z.so, libtoken_callback_sdk.z.so | вспомогательные клиентские API |
+| libtokensetproc_shared.z.so, libpermsetproc_shared.z.so | общая версия token_setproc и установки прав процесса |
+| libprivacy_sdk.z.so, libprivacy_communication_adapter_cxx.z.so | клиент privacy-сервиса (учёт использования прав). Для запуска ATM не нужны|
