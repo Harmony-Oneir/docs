@@ -54,3 +54,8 @@ typedef enum ATypeEnum {
 | libtokenid_sdk.z.so, libtoken_callback_sdk.z.so | вспомогательные клиентские API |
 | libtokensetproc_shared.z.so, libpermsetproc_shared.z.so | общая версия token_setproc и установки прав процесса |
 | libprivacy_sdk.z.so, libprivacy_communication_adapter_cxx.z.so | клиент privacy-сервиса (учёт использования прав). Для запуска ATM не нужны|
+
+В системе журналирования служба ATM имеет домен `0xD005A01`. Следующей командой можно отфильтровать его записи:
+```bash
+sudo /system/bin/hilog -D 0xD005A01
+```
