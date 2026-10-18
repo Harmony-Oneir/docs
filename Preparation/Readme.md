@@ -24,3 +24,10 @@ git clone https://github.com/Harmony-Oneir/tests.git /mnt/ohos/OpenHarmony7/test
 ```
 
 Файл [описания продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json) положите в папку `productdefine/common/products/`.
+
+# Докачиваем тяжелые исходники
+```
+cd /mnt/ohos/OpenHarmony7/foundation/arkui/ace_engine
+git lfs install
+git lfs pull --include="frameworks/bridge/arkts_frontend/arkui_idlize/*.tgz"
+```
