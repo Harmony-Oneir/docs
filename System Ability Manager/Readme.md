@@ -16,3 +16,11 @@ Samgr — это "телефонная книга" системы. Он хран
 ```
 ./make.sh samgr
 ```
+Результат сборки находится по пути `out/oneir/systemabilitymgr/samgr/`:
+
+| Файл | Что это | Нужен для запуска? |
+| --- | --- | --- |
+| samgr | Исполняемый файл реестра: становится context manager binder (handle 0) и хранит таблицу «номер SA → объект» | да, запускается первым |
+| libsamgr_proxy.z.so | Клиентская библиотека: GetSystemAbility, AddSystemAbility и т.п. Через неё к samgr обращаются sa_main, samgr_client и сервисы | да, клиентам |
+| libsamgr_common.z.so | Общий код samgr и клиентов, в первую очередь разбор профилей SA | да, samgr и sa_main |
+| libsamgr.dylib.so | Rust-обёртка над клиентом samgr. Суффикс .dylib.so OpenHarmony даёт разделяемым библиотекам на Rust | только если что-то на Rust |
