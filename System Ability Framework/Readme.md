@@ -31,4 +31,8 @@ out/oneir/systemabilitymgr/safwk/sa_main
 | libc.so | third_party/musl | libc musl от OpenHarmony, не glibc хоста |
 | libc++.so | prebuilts/clang/ohos/.../x86_64-linux-ohos | стандартная библиотека C++ из LLVM |
 
+В системе журналирования safwk имеет домен `0xD001810`. Отфильтровать журнал событий можно следующей командой:
+```
+sudo /system/bin/hilog -D 0xD001810
+```
 
