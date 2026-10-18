@@ -59,3 +59,7 @@ typedef enum ATypeEnum {
 ```bash
 sudo /system/bin/hilog -D 0xD005A01
 ```
+
+
+> **Внимание!** На системе без родного ядра Open Harmony необходимо применить исправления из раздела [Running on a non-native kernel](https://github.com/Harmony-Oneir/docs/tree/main/Running%20on%20a%20non-native%20kernel).
+> Так же для работы на не родном ядре установите `token_init` используя команду `./make.sh oneir_token_init`.
