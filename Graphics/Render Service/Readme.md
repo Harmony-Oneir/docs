@@ -7,6 +7,20 @@
 Поумолчанию RS работает в режиме OpenGL. Аргумент `graphic_2d_feature_enable_vulkan = true` переключает на Vulkan.
 Аргумент сборки `skia_use_vulkan` включает Vulkan-бэкенд в Skia. Аргумент `skia_vk_enable_partialrender` включает частичную перерисовку.
 
+При запуске RS читает системный параметр `persist.sys.graphic.GpuApitype`, который определяет режим работы:
+| persist.sys.graphic.GpuApitype |  Бэкенд |
+|---|---|
+| `0` (по умолчанию)| OpenGL |
+| `1` | Vulkan |
+| `2` | DDGR (собственный GPU-движок Huawei) |
+
+Значит, нужно:
+```
+param set persist.sys.graphic.GpuApitype 1
+param get persist.sys.graphic.GpuApitype     # должно вернуть 1
+```
+
+### После сборки
 Результат сборки находится по пути `out/oneir/graphic/graphic_2d/`:
 
 | Файл |  Назначение |
@@ -34,7 +48,7 @@
 
 | Файл | Назначение |
 |----------------------|------------|
-|libskia_canvaskit.z.so|библиотека Skia, графический движок, который в OpenHarmony собран в одну библиотеку|
+| `libskia_canvaskit.z.so` |библиотека Skia, графический движок, который в OpenHarmony собран в одну библиотеку|
 
 ## Логирование
 
@@ -42,5 +56,5 @@
 
 | Domain | Модуль |
 |-----------|-----------------------|
-| 0xD001406 | Основные логи RS, HPAE|
-| 0xD001400 | Composer, VSync и opengl_wrapper|
+| `0xD001406` | Основные логи RS, HPAE|
+| `0xD001400` | Composer, VSync и opengl_wrapper|
