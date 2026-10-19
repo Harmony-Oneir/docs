@@ -5,6 +5,8 @@
 ./make.sh oneir_graphics
 ```
 Поумолчанию RS работает в режиме OpenGL. Аргумент `graphic_2d_feature_enable_vulkan = true` переключает на Vulkan.
+Аргумент сборки `skia_use_vulkan` включает Vulkan-бэкенд в Skia. Аргумент `skia_vk_enable_partialrender` включает частичную перерисовку.
+
 Результат сборки находится по пути `out/oneir/graphic/graphic_2d/`:
 
 | Файл |  Назначение |
