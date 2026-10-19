@@ -63,6 +63,13 @@ hiview привязан к samgr. Он регистрируется в samgr к�
 sudo /system/bin/hilog -D 0xD002D10
 ```
 
+> **Примечание**: сервис hiview тесно связан с init, которого в системе без оригинального ядра Open Harmony нет.
+> Поэтому попытка запуска приведет к завершению сервиса. Характерное сообщение в журнале событий:
+> `E C02d10/HiView-HiviewPlatform: InitEnvironment: Fail to wait the samgr, err=-14700104`
+> `W C02d10/HiView-Main: main: Fail to init plugin environment. exit`.
+> Перед загрузкой плагинов hiview ждёт готовности samgr. Ждёт он не через binder, а через системный параметр: на устройстве samgr после старта выставляет параметр вида `bootevent.samgr.ready=true`, а hiview ждёт его функцией `WaitParameter` из libbegetutil. Системные параметры обслуживает служба параметров init. На стенде init нет, поэтому `WaitParameter` сразу возвращает ошибку.
+> На текущий момент этот вопрос не решен.
+
 # Faultloggerd
 faultloggerd вместе с hiview  сохраняют отчеты о падении наживных процессов. 
 При падении нативного процесса сохраняется отчёт cppcrash. В нём есть:
