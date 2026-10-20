@@ -20,6 +20,13 @@ param set persist.sys.graphic.GpuApitype 1
 param get persist.sys.graphic.GpuApitype     # должно вернуть 1
 ```
 
+После запуска RS, следующее сообщение в `hilog` подтверждает переключение на Vulkan:
+```
+PrintCurrentStatus: drawing is opened, gpu type is vulkan
+```
+
+
+
 ### После сборки
 Результат сборки находится по пути `out/oneir/graphic/graphic_2d/`:
 
