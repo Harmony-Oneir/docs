@@ -18,3 +18,10 @@ HDF разделен на уровни:
 | `libhdi.z.so` | Клиентский API HDI: `HDIServiceManager`, `IDeviceManager`, получение и регистрация сервисов. |
 | `libhdi_base.z.so` | Базовые C++ классы HDI: `HdiBase`, очереди в разделяемой памяти (`HdiSmq`). |
 | `libpub_utils.z.so` | Общие вспомогательные функции, которые используют другие модули `hdf_core`. |
+
+Также результат компиляции находится по пути `out/oneir/obj/drivers/hdf_core/adapter/uhdf2/manager/`:
+
+| Файл | Описание |
+|---|---|
+| `hdf_devmgr.cfg` | Конфиг init для сервиса `hdf_devmgr`: путь к бинарнику, uid/gid, условия и порядок запуска. По нему init стартует менеджер устройств HDF. На устройстве лежит в `/system/etc/init/` или `/vendor/etc/init/`. |
+| `hdf_devmgr.para.dac` | Права доступа (DAC: владелец, группа, режим) к системным параметрам HDF, которые читает и пишет `hdf_devmgr`. На устройстве лежит в `/system/etc/param/` или `/vendor/etc/param/`. |
