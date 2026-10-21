@@ -51,6 +51,18 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 | `libframe_analyzer.z.so` | Анализ кадров: статистика времени отрисовки, выявление пропущенных кадров (jank) |
 | `libwindow_animation.z.so` | Оконные анимации: открытие, закрытие, переходы окон (`RSWindowAnimation`) |
 
+Связанные зависимости в каталоге `out/oneir/hdf/drivers_interface_display/`:
+
+| Библиотека | Описание |
+|---|---|
+| `libdisplay_buffer_hdi_impl_v1_4.z.so` | Клиентская обёртка аллокатора (новейшая версия интерфейса): выделение буферов через IPC к `allocator_service` и отображение в память через passthrough-mapper прямо в процессе клиента. Её используют `graphic_surface` и composer RS |
+| `libdisplay_buffer_proxy_1.0.z.so` … `libdisplay_buffer_proxy_1.4.z.so` | IPC-прокси интерфейса Display Buffer, сгенерированные из IDL. Каждая версия расширяет предыдущую и зависит от неё, поэтому собирается вся линейка |
+| `libdisplay_composer_hdi_impl_1.1.z.so` … `libdisplay_composer_hdi_impl_1.5.z.so` | Клиентская обёртка Display Composer: упаковывает команды по слоям в буфер разделяемой памяти (`DisplayCmdRequester` + `SharedMemQueue`) и отправляет их сервису пачкой. Версию 1.5 RS использует при подключении к композитору (видно в backtrace) |
+| `libdisplay_composer_proxy_1.0.z.so` … `libdisplay_composer_proxy_1.5.z.so` | IPC-прокси интерфейса Display Composer, сгенерированные из IDL: экраны и режимы, VSync, hotplug, питание, слои, prepare/commit |
+| `libdisplay_commontype_proxy_1.0.z.so` … `libdisplay_commontype_proxy_2.4.z.so` | Общие типы дисплейных интерфейсов из IDL: форматы пикселей, структуры описаний буферов и слоёв, цветовые пространства, HDR, а также их сериализация для IPC. Используются и аллокатором, и композитором |
+| `libhdifd_parcelable.z.so` | Обёртка для передачи файловых дескрипторов через IPC HDI: fence'ы синхронизации и dma-buf буферов (`HdifdParcelable`) |
+
+
 Результат сборки skia находится по пути `out/oneir/thirdparty/skia/`:
 
 | Файл | Назначение |
