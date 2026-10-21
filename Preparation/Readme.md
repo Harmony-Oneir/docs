@@ -24,6 +24,7 @@ git clone https://github.com/Harmony-Oneir/tests.git /mnt/ohos/OpenHarmony7/test
 ```
 
 Файл [описания продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json) положите в папку `productdefine/common/products/`.
+Файл по пути `build/subsystem_config.json` заменить на [subsystem_config.json](https://github.com/Harmony-Oneir/productdefine/blob/main/build/subsystem_config.json).
 
 # Докачиваем тяжелые исходники
 ```
