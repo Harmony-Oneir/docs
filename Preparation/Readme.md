@@ -23,8 +23,11 @@ git clone https://github.com/Harmony-Oneir/oneir_patches.git /mnt/ohos/OpenHarmo
 git clone https://github.com/Harmony-Oneir/tests.git /mnt/ohos/OpenHarmony7/tests
 # display_composer
 git clone https://github.com/Harmony-Oneir/display_composer.git /mnt/ohos/OpenHarmony7/oneir/display_composer
-#display_buffer
+# display_buffer
 git clone https://github.com/Harmony-Oneir/display_buffer.git /mnt/ohos/OpenHarmony7/oneir/display_buffer
+# hdf_config
+git clone https://github.com/Harmony-Oneir/hdf_config.git /mnt/ohos/OpenHarmony7/oneir/hdf_config
+
 ```
 
 Файл [описания продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json) положите в папку `productdefine/common/products/`.
