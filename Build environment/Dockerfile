@@ -129,7 +129,7 @@ RUN set -xe \
     && npm install -g @ohos/hpm-cli --registry https://mirrors.huaweicloud.com/repository/npm/
 
 RUN pip3 install pyyaml
-RUN apt-get update && apt-get install -y autoconf automake libtool libtool-bin autopoint pkg-config cmake
+RUN apt-get update && apt-get install -y autoconf automake libtool libtool-bin autopoint pkg-config cmake glslang-tools
 
 # --- Инструменты Mesa из этапа 1 ---
 # Программы и их библиотеки (LLVM 18, SPIRV и др.) — в отдельный каталог,
