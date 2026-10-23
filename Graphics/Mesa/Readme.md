@@ -27,6 +27,7 @@ cat out/oneir/thirdparty/mesa3d-vk/pkgconfig/libdrm.pc
 Сборка anv:
 ```
 cd /home/openharmony/out/oneir
+rm -rf thirdparty/mesa3d-vk/build
 meson setup thirdparty/mesa3d-vk/build ../../third_party/mesa3d \
   --cross-file=thirdparty/mesa3d-vk/cross_file -Dbuildtype=release \
   -Dplatforms= -Dvulkan-drivers=intel -Dgallium-drivers= \
