@@ -16,6 +16,7 @@ root@327b02512ac3:/home/openharmony# meson --version
 Следующим шагом примените следующие патчи:
 * [mesa_x86_64_no_neon.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_x86_64_no_neon.patch)
 * [mesa_libcxx_algorithm.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_libcxx_algorithm.patch)
+* [mesa_ohos_no_wsi_display.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_ohos_no_wsi_display.patch)
 
 Сборка зависимости драйвера под x86_64:
 ```
