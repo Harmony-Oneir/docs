@@ -102,5 +102,3 @@ RUN chmod +x /build-tools.sh
 
 WORKDIR /src
 CMD ["/build-tools.sh"]
-echo "готово, инструменты:"
-ls -l "$PREFIX/bin"
