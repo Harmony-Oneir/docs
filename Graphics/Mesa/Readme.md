@@ -18,3 +18,22 @@ root@327b02512ac3:/home/openharmony# meson --version
 ./oneir/make.sh //third_party/libdrm:libdrm
 ./oneir/make.sh //third_party/zlib:libz
 ```
+Кросс-файл под x86_64:
+```
+bash oneir/gen_mesa_cross_x86_64.sh /home/openharmony out/oneir
+cat out/oneir/thirdparty/mesa3d-vk/cross_file
+cat out/oneir/thirdparty/mesa3d-vk/pkgconfig/libdrm.pc
+```
+Сборка anv:
+```
+cd /home/openharmony/out/oneir
+meson setup thirdparty/mesa3d-vk/build ../../third_party/mesa3d \
+  --cross-file=thirdparty/mesa3d-vk/cross_file -Dbuildtype=release \
+  -Dplatforms= -Dvulkan-drivers=intel -Dgallium-drivers= \
+  -Dopengl=false -Degl=disabled -Dgles1=disabled -Dgles2=disabled -Dglx=disabled -Dgbm=disabled \
+  -Dllvm=disabled -Dintel-rt=disabled -Dtools= -Dcpp_rtti=false \
+  -Dzstd=disabled -Dxmlconfig=disabled \
+  -Dmesa-clc=system -Dprecomp-compiler=system
+ninja -C thirdparty/mesa3d-vk/build
+find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.json"
+```
