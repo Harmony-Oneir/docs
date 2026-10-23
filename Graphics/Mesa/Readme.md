@@ -13,6 +13,9 @@ Options:
 root@327b02512ac3:/home/openharmony# meson --version
 1.4.1
 ```
+Следующим шагом примените следующие патчи:
+* [mesa_x86_64_no_neon.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_x86_64_no_neon.patch)
+
 Сборка зависимости драйвера под x86_64:
 ```
 ./oneir/make.sh //third_party/libdrm:libdrm
