@@ -20,6 +20,7 @@ root@327b02512ac3:/home/openharmony# meson --version
 ```
 ./oneir/make.sh //third_party/libdrm:libdrm
 ./oneir/make.sh //third_party/zlib:libz
+./oneir/make.sh //foundation/resourceschedule/qos_manager/frameworks/native:qos_ndk
 ```
 Кросс-файл под x86_64:
 ```
