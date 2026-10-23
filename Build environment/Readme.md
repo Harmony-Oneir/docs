@@ -2,15 +2,20 @@
 
 Для сборки проекта будет использоваться Docker контейнер. Этот контейнер будет использоваться на протяжении всех этапов сборки. Для сборки контейнера используйте следующую команду:
 
-```
-docker build -t openharmony:3.2 .
+```bash
+docker build -t openharmony:3.2 \
+  --build-context mesa=/mnt/ohos/OpenHarmont7/third_party/mesa3d \
+  -f Dockerfile .
 ```
 После сборки образа запуск следующей командой:
 
-```
+```bash
+# если старый контейнер с этим именем ещё есть — удалить (данные на хосте не затрагиваются)
+docker rm -f ohos-build
+
 docker run -it \
   --name ohos-build \
-  -v /mnt/ohos/source:/home/openharmony \
+  -v /mnt/ohos/OpenHarmony7:/home/openharmony \
   -w /home/openharmony \
   openharmony:3.2
 ```
