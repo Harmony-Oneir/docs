@@ -10,7 +10,7 @@
 #   meson и cmake       — через pip, тоже ради версий.
 #
 # Сборка:
-#   docker build -t mesa-tools -f Dockerfile.mesa-tools .
+#   docker build -t mesa-tools -f Dockerfile .
 #
 # Использование (дерево монтируется только на чтение, результат — наружу):
 #   docker run --rm \
