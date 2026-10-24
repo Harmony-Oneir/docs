@@ -24,9 +24,11 @@ root@327b02512ac3:/home/openharmony# meson --version
 
 Сборка зависимости драйвера под x86_64:
 ```
-./oneir/make.sh //third_party/libdrm:libdrm
-./oneir/make.sh //third_party/zlib:libz
-./oneir/make.sh //foundation/resourceschedule/qos_manager/frameworks/native:qos_ndk
+./make.sh //third_party/libdrm:libdrm
+./make.sh //third_party/zlib:libz
+./make.sh //foundation/resourceschedule/qos_manager/frameworks/native:qos_ndk
+./make.sh //foundation/graphic/graphic_2d/frameworks/vulkan_layers:vulkan_swapchain_layer
+./make.sh //foundation/graphic/graphic_2d/frameworks/vulkan_layers:vulkan_swapchain_layer_json
 ```
 Кросс-файл под x86_64:
 ```
