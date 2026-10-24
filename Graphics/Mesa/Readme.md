@@ -60,4 +60,4 @@ find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.
 | `libc.so` | Стандартная библиотека C (musl OpenHarmony) |
 
 
-Для проверки Vulkan запустите тесты (vk_probe.c)[https://github.com/Harmony-Oneir/tests/blob/main/graphics/vk_probe.c]/
+Для проверки Vulkan запустите тесты [vk_probe.c](https://github.com/Harmony-Oneir/tests/blob/main/graphics/vk_probe.c).
