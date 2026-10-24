@@ -18,6 +18,7 @@ root@327b02512ac3:/home/openharmony# meson --version
 * [mesa_libcxx_algorithm.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_libcxx_algorithm.patch)
 * [mesa_ohos_no_wsi_display.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_ohos_no_wsi_display.patch)
 * [mesa_ohos_vulkan_kms.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_ohos_no_wsi_display.patch)
+* [mesa_ohos_vk_registry.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/mesa_ohos_vk_registry.patch)
 
 Сборка зависимости драйвера под x86_64:
 ```
