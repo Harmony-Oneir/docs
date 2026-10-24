@@ -45,3 +45,15 @@ meson setup thirdparty/mesa3d-vk/build ../../third_party/mesa3d \
 ninja -C thirdparty/mesa3d-vk/build
 find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.json"
 ```
+Результат сборки `out/oneir/thirdparty/mesa3d-vk/build/src/intel/vulkan/libvulkan_intel.so`. Зависимости:
+| Зависимость | Описание |
+|---|---|
+| `libhitrace_meter.so` | Трассировка OpenHarmony (hitrace): метки производительности Mesa видны в hitrace и SmartPerf рядом с метками RS |
+| `libhilog.so` | Система логирования OpenHarmony: сообщения драйвера пишутся в hilog |
+| `libbegetutil.z.so` | Клиентская библиотека init: чтение системных параметров, например `persist.sys.graphic.openMesa3dTrace`, который включает трассировку Mesa |
+| `libqos.so` | C-API NDK из qos_manager (цель `qos_ndk`): выставляет приоритет (QoS) рабочим потокам Mesa через `OH_QoS_SetThreadQoS` |
+| `libexpat.so.1` | Разбор XML. Собран из подпроекта Mesa (`subprojects/expat-2.5.0`), а не взят из OpenHarmony, поэтому его нужно установить на целевую систему вместе с драйвером |
+| `libdrm.so` | Работа с DRM-устройством ядра: открытие `/dev/dri/*`, ioctl'ы драйвера `i915`, буферы и синхронизация |
+| `libshared_libz.z.so` | zlib из OpenHarmony: сжатие кэша шейдеров на диске |
+| `libc++.so` | Стандартная библиотека C++ из OpenHarmony clang (компилятор шейдеров Intel написан на C++) |
+| `libc.so` | Стандартная библиотека C (musl OpenHarmony) |
