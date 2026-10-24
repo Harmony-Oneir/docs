@@ -61,6 +61,6 @@ find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.
 | `libshared_libz.z.so` | zlib из OpenHarmony: сжатие кэша шейдеров на диске |
 | `libc++.so` | Стандартная библиотека C++ из OpenHarmony clang (компилятор шейдеров Intel написан на C++) |
 | `libc.so` | Стандартная библиотека C (musl OpenHarmony) |
-
+| `libsurface.z.so` | Библиотека поверхностей и буферов OpenHarmony (graphic_surface): драйвер получает через неё `BufferHandle` из `OH_NativeBuffer` (`OH_NativeBuffer_GetBufferHandle`) — dma-buf fd, размеры, шаг строки и формат буфера для `VK_OHOS_native_buffer` и `VK_OHOS_external_memory` |
 
 Для проверки Vulkan запустите тесты [vk_probe.c](https://github.com/Harmony-Oneir/tests/blob/main/graphics/vk_probe.c).
