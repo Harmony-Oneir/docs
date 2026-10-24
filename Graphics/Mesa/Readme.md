@@ -64,5 +64,7 @@ find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.
 | `libc++.so` | Стандартная библиотека C++ из OpenHarmony clang (компилятор шейдеров Intel написан на C++) |
 | `libc.so` | Стандартная библиотека C (musl OpenHarmony) |
 | `libsurface.z.so` | Библиотека поверхностей и буферов OpenHarmony (graphic_surface): драйвер получает через неё `BufferHandle` из `OH_NativeBuffer` (`OH_NativeBuffer_GetBufferHandle`) — dma-buf fd, размеры, шаг строки и формат буфера для `VK_OHOS_native_buffer` и `VK_OHOS_external_memory` |
+| `libvulkan_swapchain.so` | Слой Vulkan `VK_LAYER_OHOS_surface` из graphic_2d: реализует для приложений `VK_KHR_surface`, `VK_OHOS_surface` и `VK_KHR_swapchain` поверх окон OpenHarmony; изображения swapchain создаёт на буферах окна через `VK_OHOS_native_buffer` драйвера |
+| `VkLayer_swapchain.json` | Манифест неявного слоя для загрузчика Vulkan: имя слоя, путь к `libvulkan_swapchain.so` и список его расширений. Слой включается автоматически во всех процессах; отключается переменной `DISABLE_OHOS_SWAPCHAIN_LAYER=1` |
 
 Для проверки Vulkan запустите тесты [vk_probe.c](https://github.com/Harmony-Oneir/tests/blob/main/graphics/vk_probe.c).
