@@ -37,12 +37,13 @@ cd /home/openharmony/out/oneir
 rm -rf thirdparty/mesa3d-vk/build
 meson setup thirdparty/mesa3d-vk/build ../../third_party/mesa3d \
   --cross-file=thirdparty/mesa3d-vk/cross_file -Dbuildtype=release \
-  -Dplatforms= -Dvulkan-drivers=intel -Dgallium-drivers= \
+  -Dprefix=/vendor -Dlibdir=lib64 \
+  -Dplatforms=ohos -Dvulkan-drivers=intel -Dgallium-drivers= \
   -Dopengl=false -Degl=disabled -Dgles1=disabled -Dgles2=disabled -Dglx=disabled -Dgbm=disabled \
   -Dllvm=disabled -Dintel-rt=disabled -Dtools= -Dcpp_rtti=false \
   -Dzstd=disabled -Dxmlconfig=disabled \
   -Dmesa-clc=system -Dprecomp-compiler=system
-ninja -C thirdparty/mesa3d-vk/build
+DESTDIR=$PWD/thirdparty/mesa3d-vk/stage ninja -C thirdparty/mesa3d-vk/build install
 find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.json"
 ```
 Результат сборки `out/oneir/thirdparty/mesa3d-vk/build/src/intel/vulkan/libvulkan_intel.so`. Зависимости:
