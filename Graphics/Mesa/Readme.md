@@ -58,3 +58,6 @@ find thirdparty/mesa3d-vk/build -name "libvulkan_intel.so" -o -name "intel_icd*.
 | `libshared_libz.z.so` | zlib из OpenHarmony: сжатие кэша шейдеров на диске |
 | `libc++.so` | Стандартная библиотека C++ из OpenHarmony clang (компилятор шейдеров Intel написан на C++) |
 | `libc.so` | Стандартная библиотека C (musl OpenHarmony) |
+
+
+Для проверки Vulkan запустите тесты (vk_probe.c)[https://github.com/Harmony-Oneir/tests/blob/main/graphics/vk_probe.c]/
