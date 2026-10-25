@@ -80,4 +80,5 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 
 ## Тестирование на стенде
 
+Для тестов соберите приложение [rs_probe.cpp](https://github.com/Harmony-Oneir/tests/tree/main/graphics), которое выполнит тест базовой отрисовки через RS.
 
