@@ -82,6 +82,7 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 
 Для сборки тестов используйте команду `./make.sh rs_samples`. Перед сборкой тестов необходимо применить следующие патчи:
 * [compile_standard_whitelist_rs_samples.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/build_patches/compile_standard_whitelist_rs_samples.patch)
+* [graphic_2d_native_vsync_stdint.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/build_patches/graphic_2d_native_vsync_stdint.patch)
 
 Список тестов:
 |Цель	| Что делает |
