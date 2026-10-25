@@ -89,6 +89,5 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 |hello_rosen |	Минимальный клиент RS: создаёт RSSurfaceNode, кладёт его на экран и рисует|
 |drawing_sample_rs |	Рисует фигуры, текст и изображения через Drawing на поверхности RS	|
 |hello_vsync | Подписывается на VSync от RS и печатает отметки времени | 
-|hello_native_window | Работает с NativeWindow и буферами напрямую|
 |hello_composer |	Выводит слои напрямую через композитор, без RS|
 |drawing_text_sample |	Отрисовка текста|
