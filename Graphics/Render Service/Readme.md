@@ -77,3 +77,18 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 |-----------|-----------------------|
 | `0xD001406` | Основные логи RS, HPAE|
 | `0xD001400` | Composer, VSync и opengl_wrapper|
+
+## Тестирование на стенде
+
+Для сборки тестов используйте команду `./make.sh rs_samples`. Перед сборкой тестов необходимо применить следующие патчи:
+* [compile_standard_whitelist_rs_samples.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/build_patches/compile_standard_whitelist_rs_samples.patch)
+
+Список тестов:
+|Цель	| Что делает |
+|-----|-------------|
+|hello_rosen |	Минимальный клиент RS: создаёт RSSurfaceNode, кладёт его на экран и рисует|
+|drawing_sample_rs |	Рисует фигуры, текст и изображения через Drawing на поверхности RS	|
+|hello_vsync | Подписывается на VSync от RS и печатает отметки времени | 
+|hello_native_window | Работает с NativeWindow и буферами напрямую|
+|hello_composer |	Выводит слои напрямую через композитор, без RS|
+|drawing_text_sample |	Отрисовка текста|
