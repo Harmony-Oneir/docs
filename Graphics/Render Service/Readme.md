@@ -82,3 +82,13 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 
 Для тестов соберите приложение [rs_probe.cpp](https://github.com/Harmony-Oneir/tests/tree/main/graphics), которое выполнит тест базовой отрисовки через RS.
 
+## Режимы работы RS
+**Однопроцессный (single process)** — режим по умолчанию. Есть один процесс `render_service`, и в нём всё: дерево узлов всех клиентов, экраны, VSync, рендеринг на GPU, вывод через композитор. Клиент получает при подключении соединение с сервисом и соединение с конвейером рендеринга по умолчанию, и оба ведут в этот же процесс.
+**Многопроцессный (multi process)** — рендеринг выносится в отдельные процессы `render_process` (`render_service/main/render_process/rs_render_process_main.cpp`). Основная служба render_server при этом остаётся координатором: принимает подключения, ведёт экраны, раздаёт клиентам токены для подключения к нужному процессу рендеринга (`GetConnectToRenderToken(screenId)`). Клиент затем отправляет транзакции напрямую в «свой» процесс рендеринга через `ClientToRenderConnection`.
+
+### Что даёт multi process?
+* **изоляцию отказов**: если упадёт рендеринг одного экрана это не затронет рендеринг других экранов;
+* **параллельность**: экраны рендерятся независимо, и тяжёлая сцена на одном не задерживает кадры на другом;
+* **раздельное управление ресурсами**: свои приоритеты, лимиты памяти и, возможно, разные GPU для разных групп экранов.
+
+Режим выбирается один раз при запуске RS. `RSRenderService::InitRenderServerConfig` читает `etc/graphic/graphic_render_server_config.xml`. Парсер выставляет единый флаг `isMultiProcessModeEnabled_`. `RenderProcessManagerInit` по этому флагу создаёт один менеджер: однопроцессный (`rs_render_single_process_manager.cpp`) или многопроцессный (`rs_render_multi_process_manager.cpp`).
