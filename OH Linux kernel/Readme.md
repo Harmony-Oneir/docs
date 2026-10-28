@@ -11,7 +11,8 @@ patch -p1 < ../patches/linux-6.6/qemu-arm-linux_patch/oh_headers.patch
 
 * `0001-x86-mm-pat-fix-track_pfn_copy-after-CVE-backport.patch`
 * `0002-x86-add-missing-amd-fch-h.patch`
-
+* `0003-binfmt_misc-use-6.6-allow_write_access-API.patch`
+  
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
 rm -rf out/kernel/src_tmp out/kernel/OBJ # при необходимости отчистить сборку
