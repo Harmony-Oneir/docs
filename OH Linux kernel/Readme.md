@@ -7,6 +7,9 @@ patch -p1 --dry-run < ../patches/linux-6.6/qemu-arm-linux_patch/oh_headers.patch
 patch -p1 < ../patches/linux-6.6/qemu-arm-linux_patch/oh_headers.patch
 ```
 
+Так же для успешной сборки x64 необходимо применить исправления из репозитория [oneir_patches](https://github.com/Harmony-Oneir/oneir_patches/tree/main/linux_kernel):
+
+* 0001-x86-mm-pat-fix-track_pfn_copy-after-CVE-backport.patch
 
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
