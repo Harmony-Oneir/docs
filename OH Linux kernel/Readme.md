@@ -5,6 +5,9 @@
 cd /mnt/ohos/OpenHarmont7/kernel/linux/linux-6.6
 patch -p1 --dry-run < ../patches/linux-6.6/qemu-arm-linux_patch/oh_headers.patch
 patch -p1 < ../patches/linux-6.6/qemu-arm-linux_patch/oh_headers.patch
+
+KP=/mnt/ohos/OpenHarmont7/kernel/linux/patches/linux-6.6/rk3568_patch/kernel.patch
+patch -p1 --forward --no-backup-if-mismatch < $KP 
 ```
 
 Так же для успешной сборки x64 необходимо применить исправления из репозитория [oneir_patches](https://github.com/Harmony-Oneir/oneir_patches/tree/main/linux_kernel):
