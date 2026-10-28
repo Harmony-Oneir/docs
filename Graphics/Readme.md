@@ -1,1 +1,8 @@
+# Введение 
+В данном разделе описаны шаги для получения первого изображения на экране через Render Service. Выполнение следующих действий подразумевает наличие минимально необходимых сервисов обеспечивающих функционирование ОС. Репозитории Oneir предоставляют реализацию [display_buffer](https://github.com/Harmony-Oneir/display_buffer) и [display_composer](https://github.com/Harmony-Oneir/display_composer), которых нет в кодовой базе Open Harmony. Кроме этого в репозитории предоставлен набор [патчей для mesa](https://github.com/Harmony-Oneir/oneir_patches/tree/main/graphics), которые необходимы для работы с GPU. В папке с тестами находится [код программы](https://github.com/Harmony-Oneir/tests/blob/main/graphics/rs_probe.cpp), которая реализована с целью оценки качества работы Render Service.
 
+# Порядок сборки и запуск
+Первым шагом необходимо собрать [display_composer](https://github.com/Harmony-Oneir/display_composer) и [display_buffer](https://github.com/Harmony-Oneir/display_buffer). Следующим этапом является сборка [драйверов Vulkan](https://github.com/Harmony-Oneir/docs/tree/main/Graphics/Mesa). Для запуска драйверов необходимо собрать [HDF](https://github.com/Harmony-Oneir/docs/tree/main/Graphics/Hardware%20Driver%20Foundation). Последним этапом является сборка самого [Render Service](https://github.com/Harmony-Oneir/docs/tree/main/Graphics/Render%20Service).
+
+Установка на не родном ядре осуществляется путем запуска скрипта [install.sh](https://github.com/Harmony-Oneir/oneir/blob/main/non-native-kernel/install.sh) с аргументом `graphics`. Скрипт [start.sh](https://github.com/Harmony-Oneir/oneir/blob/main/non-native-kernel/start.sh) запустит все необходимые сервисы.
+ 
