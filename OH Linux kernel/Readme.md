@@ -36,7 +36,7 @@ sudo REBUILD=1 ./make_ohos-root.sh
 
 **Промежуточный тест**. Запустите собранное ядро через qemu:
 ```bash
- cd /mnt/ohos/OpenHarmony7                                                   
+cd /mnt/ohos/OpenHarmony7                                                   
 sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G \
   -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
   -drive file=out/oneir/ohos-root.img,format=raw,if=virtio \
