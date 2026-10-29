@@ -15,6 +15,8 @@ patch -p1 --forward --no-backup-if-mismatch < $KP
 * `0001-x86-mm-pat-fix-track_pfn_copy-after-CVE-backport.patch`
 * `0002-x86-add-missing-amd-fch-h.patch`
 * `0003-binfmt_misc-use-6.6-allow_write_access-API.patch`
+* `0004-kernel.mk-apply-missing-common-modules.patch`
+* `0005-sched-walt-use-arch_scale_cpu_capacity.patch`
   
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
