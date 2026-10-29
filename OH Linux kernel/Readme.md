@@ -28,7 +28,11 @@ cd kernel/linux/build
 
 Результат сборки находится по пути `out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage`.
 
-Следующим этапом является сборка [Init](https://github.com/Harmony-Oneir/docs/tree/main/OH%20Linux%20kernel/Init). После сборки запустите скрипт [make_ohos-root.sh](https://github.com/Harmony-Oneir/oneir/blob/main/make_ohos-root.sh), который создаст `ohos-root.img`.
+Следующим этапом является сборка [Init](https://github.com/Harmony-Oneir/docs/tree/main/OH%20Linux%20kernel/Init). После сборки запустите скрипт [make_ohos-root.sh](https://github.com/Harmony-Oneir/oneir/blob/main/make_ohos-root.sh), который создаст `ohos-root.img`:
+
+```bash
+sudo REBUILD=1 ./make_ohos-root.sh
+```
 
 **Промежуточный тест**. Запустите собранное ядро через qemu:
 ```bash
