@@ -27,3 +27,24 @@ cd kernel/linux/build
 `x86_64_oneir` — это файл конфигурации ядра Linux расположенный по пути `kernel/linux/<linux-6.6>/arch/<x86>/configs`. Файл конфигурации `x86_64_oneir` доступен [здесь](https://github.com/Harmony-Oneir/productdefine/tree/main/kernel/linux/build/linux-6.6/arch/x86/configs).
 
 Результат сборки находится по пути `out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage`.
+
+Следующим этапом является сборка [Init](https://github.com/Harmony-Oneir/docs/tree/main/OH%20Linux%20kernel/Init). После сборки запустите скрипт [make_ohos-root.sh](https://github.com/Harmony-Oneir/oneir/blob/main/make_ohos-root.sh), который создаст `ohos-root.img`.
+
+**Промежуточный тест**. Запустите собранное ядро через qemu:
+```bash
+ cd /mnt/ohos/OpenHarmony7                                                   
+sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G \
+  -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
+  -drive file=out/oneir/ohos-root.img,format=raw,if=virtio \
+  -append "root=/dev/vda rw console=ttyS0 init=/system/bin/sh" -nographic
+```
+
+В появившиеся консоли:
+```bash
+ls -l /dev/binder /dev/hwbinder /dev/vndbinder
+crw------- 1 0 0 10, 123 2026-10-29 19:07 /dev/binder
+crw------- 1 0 0 10, 122 2026-10-29 19:07 /dev/hwbinder
+crw------- 1 0 0 10, 121 2026-10-29 19:07 /dev/vndbinder
+```
+
+Все три устройства на месте. Ядро теперь полностью готово для OpenHarmony: binder, ashmem, AccessTokenID и RTG есть. 
