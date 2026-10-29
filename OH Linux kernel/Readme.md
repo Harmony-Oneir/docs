@@ -40,7 +40,8 @@ cd /mnt/ohos/OpenHarmony7
 sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G \
   -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
   -drive file=out/oneir/ohos-root.img,format=raw,if=virtio \
-  -append "root=/dev/vda rw console=ttyS0 init=init=/system/bin/init -- --second-stage" -nographic
+  -append "root=/dev/vda rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init -- --second-stage" \
+  -nographic
 ```
 
 В появившиеся консоли:
