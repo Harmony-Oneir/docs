@@ -81,3 +81,7 @@ rtg_test проверяет драйвер RTG (Related Thread Group) в пла�
 
 Результат сборки:
 * `out/oneir/tests/unittest/linux-linux/rtg_test`
+
+---
+
+После запуска `make_ohos-root.sh` тесты находятся по пути `/system/tests/`.
