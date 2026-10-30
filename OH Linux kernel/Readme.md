@@ -54,3 +54,13 @@ crw------- 1 0 0 10, 121 2026-10-29 19:07 /dev/vndbinder
 ```
 
 Все три устройства на месте. Ядро теперь полностью готово для OpenHarmony: binder, ashmem, AccessTokenID и RTG есть. 
+
+# Тестирование OH ядра
+
+Собрать тесты можно следующей командой:
+```bash
+./make.sh //kernel/linux/build/test:accesstokenid_test
+```
+Результат сборки:
+* out/oneir/tests/unittest/linux-linux/accesstokenid_test
+
