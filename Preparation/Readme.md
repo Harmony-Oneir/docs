@@ -33,6 +33,9 @@ git clone https://github.com/Harmony-Oneir/hdf_config.git /mnt/ohos/OpenHarmony7
 Файл [описания продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json) положите в папку `productdefine/common/products/`.
 Файл по пути `build/subsystem_config.json` заменить на [subsystem_config.json](https://github.com/Harmony-Oneir/productdefine/blob/main/build/subsystem_config.json).
 
+Содержимое папки [rootfs/vendor/etc](https://github.com/Harmony-Oneir/productdefine/tree/main/rootfs/vendor/etc) положите в папку `oneir`.
+
+
 # Докачиваем тяжелые исходники
 ```
 cd /mnt/ohos/OpenHarmony7/foundation/arkui/ace_engine
