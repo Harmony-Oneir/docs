@@ -135,3 +135,17 @@ ping -c 3 -I wlan0 192.168.50.1
 $W save_config
 cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 ```
+
+# Как wifi_manager общается с wpa_supplicant?
+
+В новых версиях OpenHarmony `wifi_manager` управляет `wpa_supplicant` через HDI, интерфейс драйверного фреймворка HDF. Ядро `wpa_supplicant` при этом работает внутри хоста HDF (поэтому он и собран библиотекой `libwpa.z.so`), а не отдельным процессом. Это требует HDF: [hdf_devmgr](https://github.com/Harmony-Oneir/docs/tree/main/Graphics/Hardware%20Driver%20Foundation), хосты, конфигурацию устройств.
+
+У wifi есть флаги:
+
+| Флаг | По умолчанию | Что делает |
+|---|---|---|
+| `wifi_feature_with_hdi_wpa_supported` | `true` | `wifi_manager` управляет `wpa_supplicant` через HDI (требует HDF) |
+| `wifi_feature_non_hdf_driver` | `false` | Работа с драйвером Wi‑Fi без HDF |
+| `CONFIG_CTRL_IFACE` | `"unix"` | Управление `wpa_supplicant` через UNIX-сокет |
+
+Данные флаги указываются в [описании продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json). 
