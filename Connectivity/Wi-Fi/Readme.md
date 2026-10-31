@@ -149,10 +149,12 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 | `CONFIG_CTRL_IFACE` | `"unix"` | Управление `wpa_supplicant` через UNIX-сокет |
 
 Данные флаги указываются в [описании продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json). 
+> **Примечание**: в OpenHarmony 7.0 отсутствует кодовая база для работы в режиме `non hdf`. Поэтому перед продолжением убедитесь, что сервисы hdf работают в вашей системе. Флаги сборки компонента wifi должны стоять следующим образом:
+> `"wifi_feature_with_hdi_wpa_supported = false",`
+> `"wifi_feature_non_hdf_driver = true",`
+> `"wifi_feature_with_hdi_chip_supported = false",`
 
-В режиме `non_hdf_driver` `wifi_manager` не обращается к `wpa_supplicant` напрямую. Он посылает команды отдельному процессу `wifi_hal_service`. А уже `wifi_hal_service` запускает `wpa_supplicant` и управляет им через его сокет.
-
-Собрать сетевой стек можно командой `./make.sh netstack` в контейнере. Результат сборки `out/oneir/communication/netmanager_base/`:
+Собрать сетевой стек можно командой `./make.sh netstack` в контейнере. Результат сборки находится в папке `out/oneir/communication/netmanager_base/`:
 | Название | Описание |
 |---|---|
 | `libnetsys_native_manager.z.so` | Реализация SA **NetsysNative**: единственный сервис, который напрямую меняет сетевые настройки ядра. Назначает интерфейсам IP-адреса, прописывает маршруты, управляет правилами `iptables`, содержит DNS-резолвер и сервер меток сокетов (fwmark) |
