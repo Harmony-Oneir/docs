@@ -142,11 +142,12 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 
 У wifi есть флаги:
 
-| Флаг | По умолчанию | Что делает |
-|---|---|---|
-| `wifi_feature_with_hdi_wpa_supported` | `true` | `wifi_manager` управляет `wpa_supplicant` через HDI (требует HDF) |
-| `wifi_feature_non_hdf_driver` | `false` | Работа с драйвером Wi‑Fi без HDF |
-| `CONFIG_CTRL_IFACE` | `"unix"` | Управление `wpa_supplicant` через UNIX-сокет |
+| Флаг |  Что делает |
+|---|---|
+| `wifi_feature_with_hdi_wpa_supported` | `wifi_manager` управляет `wpa_supplicant` через HDI (требует HDF) |
+| `wifi_feature_non_hdf_driver` | Работа с драйвером Wi‑Fi без HDF |
+| `CONFIG_CTRL_IFACE` | Управление `wpa_supplicant` через UNIX-сокет |
+| `drivers_peripheral_wlan_feature_enable_HDF_NL80211` | Включает работу через netlink со стандартными драйверами Linux.|
 
 Данные флаги указываются в [описании продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json). 
 > **Примечание**: в OpenHarmony 7.0 отсутствует кодовая база для работы в режиме `non hdf`. Поэтому перед продолжением убедитесь, что сервисы hdf работают в вашей системе. Флаги сборки компонента wifi должны стоять следующим образом:
