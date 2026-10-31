@@ -150,6 +150,8 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 
 Данные флаги указываются в [описании продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json). 
 
+В режиме `non_hdf_driver` `wifi_manager` не обращается к `wpa_supplicant` напрямую. Он посылает команды отдельному процессу `wifi_hal_service`. А уже `wifi_hal_service` запускает `wpa_supplicant` и управляет им через его сокет.
+
 Собрать сетевой стек можно командой `./make.sh netstack` в контейнере. Результат сборки `out/oneir/communication/netmanager_base/`:
 | Название | Описание |
 |---|---|
