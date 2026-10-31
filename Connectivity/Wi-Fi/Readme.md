@@ -149,3 +149,5 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 | `CONFIG_CTRL_IFACE` | `"unix"` | Управление `wpa_supplicant` через UNIX-сокет |
 
 Данные флаги указываются в [описании продукта](https://github.com/Harmony-Oneir/productdefine/blob/main/common/products/oneir.json). 
+
+Собрать сетевой стек можно командой `./make.sh netstack` в контейнере.
