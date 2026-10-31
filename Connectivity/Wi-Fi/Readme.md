@@ -200,4 +200,4 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 
 
 # Сборка драйверной части
-Что бы сервис HDF знал, что запускать, соберем группу `hdf_wlan` командой `./make.sh hdf_wlan` в контейнере. 
+Что бы сервис HDF знал, что запускать, соберем группу `hdf_wlan` командой `./make.sh hdf_wlan` в контейнере. Конфигурация HDF находится в репозитории [hdf_config/uhdf](https://github.com/Harmony-Oneir/oneir/tree/main/hdf_config/uhdf).
