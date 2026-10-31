@@ -89,3 +89,49 @@ sit0      Link encap:IPv6-in-IPv4
           collisions:0 txqueuelen:1000 
           RX bytes:0 TX bytes:0
 ```
+
+Для проверки работы запустите точку доступа Wi-fi следующей командой:
+```bash
+mkdir -p /data/local/tmp/ap
+cat > /data/local/tmp/ap/hostapd.conf << 'EOF'
+interface=wlan1
+driver=nl80211
+ssid=oneir-test
+hw_mode=g
+channel=6
+wpa=2
+wpa_passphrase=testpassword
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+EOF
+/vendor/bin/hostapd -B /data/local/tmp/ap/hostapd.conf
+```
+
+Сканирование:
+```bash
+W="/vendor/bin/wpa_cli -p /data/service/el1/public/wifi/sockets/wpa -i wlan0"
+$W scan; sleep 3; $W scan_results
+```
+
+Подключение:
+```bash
+$W add_network
+$W set_network 0 ssid '"oneir-test"'
+$W set_network 0 psk '"testpassword"'
+$W enable_network 0
+sleep 5; $W status
+```
+
+Передача данных:
+```bash
+ifconfig wlan1 192.168.50.1 netmask 255.255.255.0 up
+ifconfig wlan0 192.168.50.2 netmask 255.255.255.0 up
+ping -c 3 -I wlan0 192.168.50.1
+```
+
+Сохранение:
+
+```bash
+$W save_config
+cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
+```
