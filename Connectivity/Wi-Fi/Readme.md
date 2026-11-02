@@ -1,5 +1,5 @@
 # Введение
-Для работы с Wi-Fi в Open Harmony существует SA сервис `wifi_manager`. Данный сервис не связывается в Wi-Fi модулем напрямую. Для связи с железом `wifi_manager` использует wpa_supplicant. 
+Для работы с Wi-Fi в Open Harmony существует SA сервис `wifi_manager`. Данный сервис не связывается в Wi-Fi модулем напрямую. Для связи с железом `wifi_manager` использует wpa_supplicant. Таким образом вся работа с железом идёт через HDI-сервисы в хостах HDF.
 
 Для реализации Wi-Fi необходимо следующее:
 | Слой | Что это | Откуда взять |
@@ -8,8 +8,6 @@
 | 2. Прошивка чипа | Бинарный файл, который драйвер загружает в адаптер | Пакет `linux-firmware` |
 | 3. Подключение к сети | `wpa_supplicant`: поиск сети, авторизация WPA2 | `third_party/wpa_supplicant` из OpenHarmony |
 | 4. IP-адрес | DHCP-клиент или статический адрес | `dhcp_client` из OpenHarmony или `ifconfig` из Toybox |
-
-В полноценной реализации над этим работают ещё `wifi_manager`, `netmanager` и HAL Wi-Fi через HDF.
 
 # Сборка
 
