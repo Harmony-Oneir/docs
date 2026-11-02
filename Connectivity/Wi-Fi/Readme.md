@@ -1,4 +1,6 @@
 # Введение
+Для работы с Wi-Fi в Open Harmony существует SA сервис `wifi_manager`. Данный сервис не связывается в Wi-Fi модулем напрямую. Для связи с железом `wifi_manager` использует wpa_supplicant. 
+
 Для реализации Wi-Fi необходимо следующее:
 | Слой | Что это | Откуда взять |
 |---|---|---|
@@ -201,3 +203,8 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 
 # Сборка драйверной части
 Что бы сервис HDF знал, что запускать, соберем группу `hdf_wlan` командой `./make.sh hdf_wlan` в контейнере. Конфигурация HDF находится в репозитории [hdf_config/uhdf](https://github.com/Harmony-Oneir/oneir/tree/main/hdf_config/uhdf).
+
+
+# wifi_manager_service
+
+`wifi_manager_service` — это процесс, в котором работают несколько SA: `1120` (режим клиента), `1121` (точка доступа), `1123` (Wi-Fi Direct), `1124` (сканирование), а также DHCP-клиент и сервер (`1126`, `1127`).
