@@ -212,12 +212,89 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 # Сборка драйверной части
 Что бы сервис HDF знал, что запускать, соберем группу `hdf_wlan` командой `./make.sh hdf_wlan` в контейнере. Конфигурация HDF находится в репозитории [hdf_config/uhdf](https://github.com/Harmony-Oneir/oneir/tree/main/hdf_config/uhdf).
 
+### Состав группы
+
+| Цель | Что собирает |
+|---|---|
+| `//drivers/peripheral/wlan:wlan_entry` | Сервис адаптера `wlan_interface_service` и `wifi_hal`, работающий с драйвером через `nl80211` |
+| `//drivers/peripheral/wlan/chip:wlan_chip_entry` | Сервис чипа `chip_interface_service` и его реализацию `wifi_hal_default` поверх `nl80211` |
+| `//drivers/peripheral/wlan/wpa:wpa_entry` | Сервис `wpa_interface_service`, внутри которого работает ядро `wpa_supplicant` (`libwpa`) |
+| `//drivers/peripheral/wlan/hostapd:hostapd_entry` | Сервис `hostapd_interface_service` для режима точки доступа |
+| `//oneir/hdf_config/uhdf:hdf_config` | `hdf_default.hcb` (описание хостов и устройств для `hdf_devmgr`) и `hdf_devhost.cfg` (конфиги init для запуска хостов) |
+
+### Флаги продукта
+
+Драйверный слой собирается для стандартных драйверов Linux, по образцу rk3568. В описании продукта (`productdefine/common/products/oneir.json`) для компонента `drivers_peripheral_wlan` заданы:
+
+| Флаг | Значение | Назначение |
+|---|---|---|
+| `drivers_peripheral_wlan_feature_enable_HDF_NL80211` | `true` | Работа с ядром через `nl80211` |
+| `drivers_peripheral_wlan_feature_vendor` | `default` | Реализация сервиса чипа по умолчанию, без кода производителя |
+| `drivers_peripheral_wlan_feature_enable_HDF_WLAN_EXTEND_VDI` | `false` | Без расширения производителя (`libhdi_wlan_impl.z.so`) |
+| `drivers_peripheral_wlan_p2p_name` | `p2p-dev-wlan0` | Имя интерфейса Wi-Fi Direct |
+| `drivers_peripheral_wlan_feature_enable_HDF_UT` | `false` | Без тестового режима |
+
+После изменения флагов настройки сборки нужно пересоздать: `./make.sh --reload hdf_wlan`.
+
+### Хосты
+
+Файл `device_info.hcs` описывает три хоста Wi-Fi:
+
+| Хост | Сервисы | Запуск |
+|---|---|---|
+| `wifi_host` | `wlan_interface_service`, `chip_interface_service` | При загрузке |
+| `wpa_host` | `wpa_interface_service` | По запросу `wifi_manager` (`preload = 2`) |
+| `hostapd_host` | `hostapd_interface_service` | По запросу (`preload = 2`) |
+
+Номера хостов в `hdf_devhost.cfg` вычисляются из `device_info.hcs`, поэтому после любого изменения конфигурации файлы `hdf_default.hcb` и `hdf_devhost.cfg` нужно ставить в образ вместе.
+
+### Проверка
+
+После загрузки системы хост `wifi_host` должен быть запущен, а оба его сервиса инициализированы без ошибок:
+
+```sh
+ps -A -o PID,USER,NAME | grep -E "hdf_devmgr|_host"
+hilog -x | grep -i "HDF_WIFI_CORE" | tail -10
+```
+
+Хосты `wpa_host` и `hostapd_host` появятся только после включения Wi-Fi (`ohos-wifiManager sta-enable`) или запуска точки доступа соответственно.
 
 # wifi_manager_service
 
 `wifi_manager_service` — это процесс, в котором работают несколько SA: `1120` (режим клиента), `1121` (точка доступа), `1123` (Wi-Fi Direct), `1124` (сканирование), а также DHCP-клиент и сервер (`1126`, `1127`).
 
-Описание перечисленных SA сервисов находятся в репозитори [oneir/profile](https://github.com/Harmony-Oneir/oneir/tree/main/profile) (`wifi_manager_service.json`, `netsysnative.json`, `netmanager.json`).
-
+Описание перечисленных SA сервисов находятся в репозитори [oneir/profile](https://github.com/Harmony-Oneir/oneir/tree/main/profile) (`wifi_manager_service.json`, `netsysnative.json`, `netmanager.json`). При сборке образа они копируются в `/system/profile/`.
 
 Для работы с wi-fi у процесса должны быть соответствующие разрешения. В OpenHarmony root (uid 0) не даёт прав автоматически. Права проверяются по токену доступа процесса. У каждого процесса есть токен, а у токена — список разрешений. CLI инструмент для управления `wifi_manager` (`/system/bin/cli_tool/executable/ohos-wifiManager`) запускается из консоли и наследует её токен. Консоль запускает init по конфигу [console.cfg](https://github.com/Harmony-Oneir/productdefine/blob/main/rootfs/system/etc/init/console.cfg). Таким образом разрешения должны быть перечислены в нем. 
+
+## Сборка
+
+Для сборки выполните команду `./make.sh netstack` в контейнере. Результаты сборки наход в `out/oneir/communication/wifi/`, `out/oneir/communication/dhcp/` и `out/oneir/communication/netmanager_base/`.
+
+## Управление через ohos-wifiManager
+
+Утилита лежит в каталоге CLI-инструментов и не входит в `PATH`:
+
+```sh
+export PATH=$PATH:/system/bin/cli_tool/executable
+```
+
+| Команда | Действие |
+|---|---|
+| `sta-enable` | Включить Wi-Fi в режиме клиента |
+| `sta-disable` | Выключить Wi-Fi |
+| `scan-start` | Запустить сканирование |
+| `scan-list` | Показать результаты последнего сканирования |
+| `sta-connect --ssid <имя> --preSharedKey <пароль>` | Подключиться к сети |
+| `sta-getLinkedInfo` | Состояние текущего подключения |
+
+Ответы выводятся в формате JSON. Сканирование занимает несколько секунд, поэтому `scan-list` сразу после `scan-start` может вернуть пустой список.
+
+Пример сценария:
+
+```sh
+ohos-wifiManager sta-enable; sleep 3; ohos-wifiManager sta-enable
+ohos-wifiManager scan-start; sleep 6; ohos-wifiManager scan-list
+ohos-wifiManager sta-connect --ssid oneir-test --preSharedKey testpassword
+sleep 10; ohos-wifiManager sta-getLinkedInfo
+```
