@@ -208,3 +208,6 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 `wifi_manager_service` — это процесс, в котором работают несколько SA: `1120` (режим клиента), `1121` (точка доступа), `1123` (Wi-Fi Direct), `1124` (сканирование), а также DHCP-клиент и сервер (`1126`, `1127`).
 
 Описание перечисленных SA сервисов находятся в репозитори [oneir/profile](https://github.com/Harmony-Oneir/oneir/tree/main/profile) (`wifi_manager_service.json`, `netsysnative.json`, `netmanager.json`).
+
+
+Для работы с wi-fi у процесса должны быть соответствующие разрешения. В OpenHarmony root (uid 0) не даёт прав автоматически. Права проверяются по токену доступа процесса. У каждого процесса есть токен, а у токена — список разрешений. CLI инструмент для управления `wifi_manager` (`/system/bin/cli_tool/executable/ohos-wifiManager`) запускается из консоли и наследует её токен. Консоль запускает init по конфигу [console.cfg](https://github.com/Harmony-Oneir/productdefine/blob/main/rootfs/system/etc/init/console.cfg). Таким образом разрешения должны быть перечислены в нем. 
