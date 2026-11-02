@@ -9,6 +9,8 @@
 | 3. Подключение к сети | `wpa_supplicant`: поиск сети, авторизация WPA2 | `third_party/wpa_supplicant` из OpenHarmony |
 | 4. IP-адрес | DHCP-клиент или статический адрес | `dhcp_client` из OpenHarmony или `ifconfig` из Toybox |
 
+Перед продолжением примените патчи из списка [wifi](https://github.com/Harmony-Oneir/oneir_patches/tree/main/wifi).
+
 # Сборка
 
 
