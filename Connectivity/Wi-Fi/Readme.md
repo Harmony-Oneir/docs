@@ -206,3 +206,5 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 # wifi_manager_service
 
 `wifi_manager_service` — это процесс, в котором работают несколько SA: `1120` (режим клиента), `1121` (точка доступа), `1123` (Wi-Fi Direct), `1124` (сканирование), а также DHCP-клиент и сервер (`1126`, `1127`).
+
+Описание перечисленных SA сервисов находятся в репозитори [oneir/profile](https://github.com/Harmony-Oneir/oneir/tree/main/profile) (`wifi_manager_service.json`, `netsysnative.json`, `netmanager.json`).
