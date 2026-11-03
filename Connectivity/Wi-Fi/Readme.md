@@ -298,3 +298,6 @@ ohos-wifiManager scan-start; sleep 6; ohos-wifiManager scan-list
 ohos-wifiManager sta-connect --ssid oneir-test --preSharedKey testpassword
 sleep 10; ohos-wifiManager sta-getLinkedInfo
 ```
+
+# DHCP-сервер
+DHCP-сервер OpenHarmony сделан как SA (`1127`) и работает внутри процесса `wifi_manager_service`. Но это не самостоятельный сервис, который можно направить на любой интерфейс: им управляет сам `wifi_manager` через `dhcp_sdk`. Он запускает DHCP-сервер, когда включается режим точки доступа (SA `1121`, `WifiHotspot`), и раздаёт адреса устройствам, подключившимся к раздаче Wi-Fi с этого устройства.
