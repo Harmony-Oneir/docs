@@ -17,6 +17,7 @@ patch -p1 --forward --no-backup-if-mismatch < $KP
 * `0003-binfmt_misc-use-6.6-allow_write_access-API.patch`
 * `0004-kernel.mk-apply-missing-common-modules.patch`
 * `0005-sched-walt-use-arch_scale_cpu_capacity.patch`
+* `0007-kernel.mk-build-and-install-kernel-modules.patch`
   
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
