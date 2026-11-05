@@ -42,3 +42,15 @@ cd /mnt/ohos/OpenHarmony7/foundation/arkui/ace_engine
 git lfs install
 git lfs pull --include="frameworks/bridge/arkts_frontend/arkui_idlize/*.tgz"
 ```
+
+
+### is_emulator
+
+В `build/config/BUILDCONFIG.gn` любая сборка для `target_os == "ohos"` и `target_cpu == "x86_64"`
+считается сборкой для эмулятора: `is_emulator = true` устанавливается после `declare_args()`, поэтому
+аргументом сборки его не отменить. Признак меняет поведение многих компонентов, в том числе `hdc`
+(макрос `HDC_EMULATOR`: при незаданном `persist.hdc.mode` демон работает в режиме моста, а USB и TCP
+выключаются), `access_token` (`X86_EMULATOR_MODE`) и `selinux_adapter` (`EMULATOR_MODE`). Для `hdcd`
+это обходится параметром `persist.hdc.mode=tcp` в `oneir.para`. Для `oneir`, работающего на реальном
+железе, правильнее `is_emulator = false`; это потребует изменения `BUILDCONFIG.gn` и проверки
+влияния признака на каждый компонент.
