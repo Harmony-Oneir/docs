@@ -50,6 +50,7 @@ group("qos") {
 ./oneir/make.sh qos
 ```
 
+Результат сборки находится по пути `out/oneir/resourceschedule/qos_manager/`.
 
 ## Проверка
 
