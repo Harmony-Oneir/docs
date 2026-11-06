@@ -50,7 +50,7 @@ group("qos") {
 ./oneir/make.sh qos
 ```
 
-Результат сборки находится по пути `out/oneir/resourceschedule/qos_manager/`.
+Результат сборки находится по пути `out/oneir/resourceschedule/qos_manager/`. Файл описания сервиса: [concurrent_task_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/concurrent_task_service.json).
 
 ## Проверка
 
