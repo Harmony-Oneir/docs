@@ -97,3 +97,8 @@ rtg_test проверяет драйвер RTG (Related Thread Group) в пла�
 ---
 
 После запуска `make_ohos-root.sh` тесты находятся по пути `/system/tests/`.
+
+# Следующие шаги
+
+1. [Init](https://github.com/Harmony-Oneir/docs/tree/main/OH%20Linux%20kernel/Init)
+2. [Resource Planning](https://github.com/Harmony-Oneir/docs/tree/main/OH%20Linux%20kernel/Resource%20Planning)
