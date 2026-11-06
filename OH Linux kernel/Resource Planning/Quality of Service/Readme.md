@@ -70,7 +70,18 @@ CONFIG_QOS_AUTHORITY=y
 
 Служба управляет правами через устройство `/dev/auth_ctrl`, которое создаёт модуль `auth_ctl`. Владелец и права файла задаются штатным конфигом `ueventd` из компонента `init` (`base/startup/init/ueventd/etc/ueventd.config`: `/dev/auth_ctrl 0660 system system`), поэтому служба, работающая от пользователя `system`, может его открыть без дополнительной настройки.
 
+### Число политик QoS
 
+Служба `qos_manager` при запуске задаёт ядру пять политик QoS (`QosPolicy::Init` в `qos_policy.cpp`):
+`QOS_POLICY_DEFAULT` (1), `QOS_POLICY_SYSTEM_SERVER` (2), `QOS_POLICY_FRONT` (3), `QOS_POLICY_BACK` (4)
+и `QOS_POLICY_FOCUS` (5). Ядро принимает номера политик меньше `QOS_POLICY_MAX_NR`, который задаётся опцией
+`CONFIG_QOS_POLICY_MAX_NR` (по умолчанию 5, допустимо от 5 до 20). При значении по умолчанию политика `focus`
+отвергается, и служба пишет `set g_focusQosPolicy failed, errno = 1`. На эталоне rk3568 опция не задана,
+то есть расхождение есть и там. Для `oneir` задано `CONFIG_QOS_POLICY_MAX_NR=6`.
+
+Отказы `pid not authorized` для сетевых сервисов (`netmanager`, `netsysnative`) ожидаемы: они работают от
+собственных пользователей, а права на QoS ядро автоматически выдаёт только `system` (`SUPER_UID`); остальным
+права выдаёт закрытое расширение `libtask_controller.z.so` или `frame_aware_sched` (для приложений на переднем плане).
 
 ## Сборка
 
