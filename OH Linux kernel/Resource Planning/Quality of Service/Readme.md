@@ -28,6 +28,47 @@
 Сами решения о процессорном времени принимает ядро. Для этого в ядре OpenHarmony есть отдельные возможности (управление QoS и группы связанных потоков RTG), с которыми работает служба через специальные устройства ядра.
 
 
+# Поддержка QoS в ядре
+
+## Как клиенты QoS работают с ядром
+
+Уровень QoS потоку назначает не сама служба `concurrent_task_service`, а клиентская библиотека в процессе, который его запрашивает: она напрямую обращается к специальным файлам ядра в `/proc` (`foundation/resourceschedule/qos_manager/services/src/qos_interface.cpp`).
+
+| Файл | Назначение | Опция ядра |
+| --- | --- | --- |
+| `/proc/thread-self/sched_qos_ctrl` | Уровень QoS потока | `CONFIG_QOS_CTRL` (создаётся в `fs/proc/base.c` под `#ifdef CONFIG_QOS_CTRL`) |
+| `/proc/self/sched_rtg_ctrl` | Группы связанных потоков (RTG), используются планированием с учётом отрисовки кадров | `CONFIG_SCHED_RTG`, `CONFIG_SCHED_RTG_FRAME` |
+
+Если узла QoS нет, служба запускается и публикует SA 1912, но уровни потоков не применяются: клиенты получают ошибку и продолжают работу без приоритетов. В журнале это выглядит так (на примере `netsysnative`, назначающего уровень своему потоку DNS):
+
+```
+E C01707/CONCUR: [Interface] task 133 belong to user 1098 open qos node failed, errno = 2
+```
+
+## Модуль qos_auth
+
+Опции управления QoS и правами описаны не в дереве ядра, а в общем модуле OpenHarmony `kernel/linux/common_modules/qos_auth/auth_ctl`. При сборке ядра `kernel/linux/build/kernel.mk` применяет `common_modules/qos_auth/apply_qos_auth.sh`, который добавляет модуль в дерево ядра как `drivers/auth_ctl` (подключается в `drivers/Kconfig` и `drivers/Makefile`). Поэтому опции доступны в конфигурации ядра без дополнительных шагов, но по умолчанию выключены.
+
+| Опция | Назначение |
+| --- | --- |
+| `CONFIG_AUTHORITY_CTRL` | Контроль прав на возможности RTG и QoS по `uid`. Через него служба QoS выдаёт и отзывает права (устройство `/dev/auth_ctrl`). Должна быть `=y`: от неё зависят остальные опции, которые могут быть только встроенными |
+| `CONFIG_QOS_CTRL` | Уровни QoS для потоков и узел `/proc/thread-self/sched_qos_ctrl` |
+| `CONFIG_RTG_AUTHORITY` | Проверка прав для команд RTG |
+| `CONFIG_QOS_AUTHORITY` | Проверка прав для команд QoS |
+
+На эталонной плате rk3568 (`kernel/linux/config/linux-6.6/rk3568/arch/arm64_defconfig`, а также для ядра 5.10) и на плате wukong100 включены все четыре опции. Тот же набор включён в `x86_64_oneir_standard_defconfig`:
+
+```
+# Управление QoS потоков и права на RTG/QoS (common_modules/qos_auth), как на rk3568
+CONFIG_AUTHORITY_CTRL=y
+CONFIG_QOS_CTRL=y
+CONFIG_RTG_AUTHORITY=y
+CONFIG_QOS_AUTHORITY=y
+```
+
+С `QOS_AUTHORITY` и `RTG_AUTHORITY` ядро разрешает команды только тем `uid`, кому права выдала служба QoS. Если вместо отсутствия узла (`errno = 2`) клиенты начинают получать отказ в доступе, значит, проверка работает, и нужно смотреть выдачу прав службой и доступ к `/dev/auth_ctrl` (права на устройство задаются конфигом `ueventd`).
+
+
 
 ## Сборка
 
