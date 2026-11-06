@@ -18,6 +18,7 @@ patch -p1 --forward --no-backup-if-mismatch < $KP
 * `0004-kernel.mk-apply-missing-common-modules.patch`
 * `0005-sched-walt-use-arch_scale_cpu_capacity.patch`
 * `0007-kernel.mk-build-and-install-kernel-modules.patch`
+* [0001-qos_auth-include-linux-compat.h-for-compat_ptr.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/common_modules/0001-qos_auth-include-linux-compat.h-for-compat_ptr.patch)
   
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
