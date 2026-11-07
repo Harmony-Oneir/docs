@@ -115,4 +115,16 @@ hilog -x | grep -E "SA:1912|concurrent" | tail -5
 
 Ожидается процесс `concurrent_task_service` от пользователя `system` и публикация SA 1912. 
 
-Для сборки тестов используйте команду `./make.sh qos_test` в контейнере. Результат сборки находится по пути `out/oneir/tests/unittest/qos_manager/qos_manager`.
+Для сборки тестов используйте команду `./make.sh qos_test` в контейнере. Результат сборки находится по пути `out/oneir/tests/unittest/qos_manager/qos_manager`:
+| Тест | Описание |
+| --- | --- |
+| `concurrent_svc_intf_test` | Интерфейс службы `concurrent_task_service`: вызовы методов службы через её IPC-интерфейс |
+| `concurrent_task_client_test` | Клиентская библиотека `concurrent_task_client`: обращения к работающей службе (SA 1912) из другого процесса |
+| `concurrent_task_controller_interface_test` | Обёртка над расширением `libtask_controller.z.so` (контроллер задач, выдача прав). Без закрытого расширения часть проверок ожидаемо не проходит |
+| `concurrent_task_service_ability_test` | Системная способность службы: запуск, публикация в `samgr`, реакция на появление и исчезновение других SA |
+| `concurrent_task_service_test` | Логика самой службы: обработка запросов, отчёты о событиях, взаимодействие с контроллером задач |
+| `func_loader_test` | Загрузчик расширений `FuncLoader`: загрузка библиотеки и поиск функций в ней. Проверки с `libtask_controller.z.so` ожидаемо не проходят |
+| `qos_interface_test` | Работа с возможностями ядра напрямую: узлы `/proc/thread-self/sched_qos_ctrl` и `/proc/self/sched_rtg_ctrl`, применение и снятие уровней QoS, права. Проверяет конфигурацию ядра |
+| `qos_ndk_test` | Интерфейс QoS для нативного кода приложений (NDK, `libqos.so`): назначение, получение и сброс уровня QoS потока |
+| `qos_policy_test` | Задание политик QoS ядру (`QosPolicy::Init`): таблицы «уровень QoS → параметры планирования» для разных сценариев |
+| `qos_test` | Библиотека уровней QoS для системных компонентов (`libqos.z.so`): назначение уровней текущему и другим потокам |
