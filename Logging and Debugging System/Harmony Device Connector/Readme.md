@@ -79,6 +79,29 @@ persist.hdc.port=8710
 
 
 ## Использование
+Для использования в QEMU запустите виртуальную машину следующей командой:
+```bash
+sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
+  -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
+  -drive file=out/oneir/ohos-root.img,format=raw,if=virtio,snapshot=on \
+  -drive file=out/oneir/userdata.img,format=raw,if=virtio \
+  -netdev user,id=n0,hostfwd=tcp:127.0.0.1:18710-:8710 \
+  -device e1000,netdev=n0 \
+  -append "root=/dev/vda rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init quiet loglevel=3" \
+  -nographic
+```
+
+На хосте поместите зависимости в переменные окружения:
+```bash
+HDC=$(sudo find out/oneir/clang_x64 -name hdc -type f -not -path "*unstripped*" | head -1)
+LIBS=$(sudo find out/oneir/clang_x64 -name "*.so" -not -path "*unstripped*" -printf '%h\n' | sort -u | tr '\n' ':')
+```
+
+Установите соединение:
+```bash
+LD_LIBRARY_PATH="$LIBS" "$HDC" tconn 127.0.0.1:18710
+LD_LIBRARY_PATH="$LIBS" "$HDC" list targets
+```
 
 ```bash
 hdc tconn <адрес устройства>:8710   # подключиться по сети
