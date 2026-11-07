@@ -114,3 +114,5 @@ hilog -x | grep -E "SA:1912|concurrent" | tail -5
 ```
 
 Ожидается процесс `concurrent_task_service` от пользователя `system` и публикация SA 1912. 
+
+Для сборки тестов используйте команду `./make.sh qos_test` в контейнере.
