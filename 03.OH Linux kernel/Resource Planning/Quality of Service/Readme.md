@@ -104,7 +104,16 @@ group("qos") {
 ./oneir/make.sh qos
 ```
 
-Результат сборки находится по пути `out/oneir/resourceschedule/qos_manager/`. Файл описания сервиса: [concurrent_task_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/concurrent_task_service.json).
+Результат сборки находится по пути `out/oneir/resourceschedule/qos_manager/`:
+
+| Название зависимости | Описание |
+| --- | --- |
+| `libconcurrent_task_client.z.so` | Клиентская библиотека для взаимодействия с системной службой распределения параллельных задач (`concurrent_task_service`). Позволяет клиентским процессам отправлять запросы на оптимизацию потоков. |
+| `libconcurrentsvc.z.so` | Основная серверная библиотека сервиса параллельных задач (`concurrent_task_service`). Отвечает за координацию фоновых потоков, управление приоритетами вычислений и балансировку нагрузки. |
+| `libqos.so` | Базовая библиотека контроля качества обслуживания (Quality of Service / QoS) для управления приоритетами и ресурсами потоков выполнения на уровне ядра и пользовательского пространства. |
+| `libqos.z.so` | Скомпилированная подсистема QoS (с суффиксом `.z.so` для динамического компоновщика musl), обеспечивающая интерфейс настройки политик планировщика для критически важных по производительности процессов. |
+
+Файл описания сервиса: [concurrent_task_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/concurrent_task_service.json).
 
 ## Проверка
 
