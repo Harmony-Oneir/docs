@@ -75,7 +75,7 @@ persist.hdc.port=8710
 
 Демон: `./make.sh hdcd`. Программа собирается под именем `hdcd_system` в `out/oneir/developtools/hdc/` (так её отличают от варианта для режима обновления, `hdcd_updater`), а модуль `hdcd_system` ставит её в образ как `/system/bin/hdcd`. 
 
-Клиент: `./make.sh hdc_host_linux`, результат — `out/oneir/clang_x64/.../hdc`.
+Клиент: `./make.sh hdc_host_linux`, результат — `out/oneir/clang_x64/developtools/hdc/hdc`.
 
 
 ## Использование
