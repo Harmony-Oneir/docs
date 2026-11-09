@@ -24,3 +24,6 @@ Samgr — это "телефонная книга" системы. Он хран
 | libsamgr_proxy.z.so | Клиентская библиотека: GetSystemAbility, AddSystemAbility и т.п. Через неё к samgr обращаются sa_main, samgr_client и сервисы | да, клиентам |
 | libsamgr_common.z.so | Общий код samgr и клиентов, в первую очередь разбор профилей SA | да, samgr и sa_main |
 | libsamgr.dylib.so | Rust-обёртка над клиентом samgr. Суффикс .dylib.so OpenHarmony даёт разделяемым библиотекам на Rust | только если что-то на Rust |
+
+### Запуск в системе
+Вовремя загрузки системы, Init ищет файл `samgr_standard.cfg` по пути `/system/etc/init/`.
