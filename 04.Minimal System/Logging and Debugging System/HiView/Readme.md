@@ -137,3 +137,17 @@ Hitrace — это системный инструмент трассирова�
 ## Использование hitrace
 
 `hitrace` просит `hiview` записать трассу ftrace за указанное время по выбранным категориям. Для работы нужны смонтированный `tracefs`, работающий `hiview` и право `ohos.permission.HIVIEW_TRACE_MANAGE` у вызывающего shell: его дают `hdc shell` или поля `apl/permission` у сервиса `console`.
+
+Пример запуска:
+```bash
+hitrace -l                                                       # категории
+hitrace -t 5 -b 8192 sched -o /data/log/hitrace/sched.ftrace     # планировщик, 5 с
+hitrace -t 10 -b 8192 sched binder ipc samgr                     # планировщик + IPC сервисов
+ls -lt /data/log/hitrace/                                        # где результат
+```
+Файл записывает процесс hiview, а не ваш shell. Поэтому каталог из -o должен быть доступен пользователю hiview. Без -o файл появляется в /data/log/hitrace/.
+Результат в текстовом формате ftrace, одна строка на событие:
+```
+samgr-80      [001] .... 1234.567890: tracing_mark_write: B|80|H:SubscribeSystemAbility
+<поток>-<tid> [CPU] флаги <сек. с загрузки>: <событие>: <данные>
+```
