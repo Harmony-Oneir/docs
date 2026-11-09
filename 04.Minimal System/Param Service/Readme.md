@@ -22,6 +22,11 @@ Param Service (подсистема системных параметров) в 
 
 После запуска системы, Init ожидает файл `system/etc/init/param_watcher.cfg` для запуска. Запускается через `sa_main` из профиля [`/system/profile/param_watcher.json`](https://github.com/Harmony-Oneir/oneir/blob/main/profile/param_watcher.json).
 
+После запуска, Param Watcher устанавливает флаг `true`:
+```bash
+param get bootevent.param_watcher.started
+```
+
 ## Виды параметров
 
 Поведение параметра определяется его именем:
