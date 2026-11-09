@@ -36,6 +36,8 @@ sudo /system/bin/hilog -D 0xD002D10
 
 Hiview устроен как платформа с плагинами: сам бинарник `hiview` — это ядро (загрузка конфигов, очередь событий, распределение по плагинам), а вся полезная работа выполняется в плагинах. Faultlogger, сбор трассы (UnifiedCollector), хранение событий, eventlogger, детектор зависаний — всё это плагины. Главный список плавунов находится в файле `/system/etc/hiview/plugin_config`. 
 
+Для запуска у вызывающего должны быть разрешения `ohos.permission.HIVIEW_TRACE_MANAGE` и `ohos.permission.DUMP`.
+
 
 
 # Faultloggerd
