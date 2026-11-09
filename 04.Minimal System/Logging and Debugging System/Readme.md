@@ -92,7 +92,7 @@ faultloggerd от samgr не зависит. Процессы обращаютс
 ### Как это работает?
 При старте любого процесса, собранного под OpenHarmony (с musl из её sysroot), ставится обработчик сигналов DFX на `SIGSEGV`, `SIGABRT`, `SIGBUS`, `SIGILL`, `SIGFPE` и другие. В современных версиях это делается при инициализации libc.
 При сбое обработчик запускает `/system/bin/processdump`. Тот подключается к упавшему процессу через `ptrace`, раскручивает стек и через сокет faultloggerd получает файл для отчёта.
-Отчёт появляется в `/data/log/faultlog/temp/cppcrash-<имя>-<pid>-<время>`.
+Отчёт появляется в `/data/log/faultlog/temp/cppcrash-<имя>-<pid>-<время>` или по пути `/log/crash/cppcrash-<имя>-<pid>-<время>`.
 
 ## Сборка hiview и faultloggerd
 Для сборки hiview и faultloggerd используйте следующую команду в контейнере:
