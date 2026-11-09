@@ -64,6 +64,10 @@ sudo /system/bin/hilog -D 0xD005A01
 > **Внимание!** На системе без родного ядра Open Harmony необходимо применить исправления из раздела [Running on a non-native kernel](https://github.com/Harmony-Oneir/docs/tree/main/Running%20on%20a%20non-native%20kernel).
 > Так же для работы на не родном ядре установите `token_init` используя команду `./make.sh oneir_token_init`.
 
+### Запуск в системе
+После старта системы, Init необходимо найти файл `access_token.cfg` по пути `/system/etc/init/`. ATM представляет из себя SA сервис, поэтому в системе должен быть установлен [`sa_main`](https://github.com/Harmony-Oneir/docs/tree/main/04.Minimal%20System/System%20Ability%20Framework). Описание профиля ожидается по пути [`/system/profile/accesstoken_service.json`](https://github.com/Harmony-Oneir/oneir/blob/main/profile/accesstoken_service.json).
+
+
 # Откуда ATM знает о правах сервисов? 
 **Нативные процессы**: в `.cfg` службы указаны apl и список permission. init передаёт их в libnativetoken, и они попадают в `nativetoken.json`. ATM читает этот файл при старте. На стенде без оригинального ядра эту роль играет наша реализация `token_init`, который запускается при старте и создает список разрешений. 
 
