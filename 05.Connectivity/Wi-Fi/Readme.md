@@ -148,7 +148,7 @@ cat /data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf
 
 # Как wifi_manager общается с wpa_supplicant?
 
-В новых версиях OpenHarmony `wifi_manager` управляет `wpa_supplicant` через HDI, интерфейс драйверного фреймворка HDF. Ядро `wpa_supplicant` при этом работает внутри хоста HDF (поэтому он и собран библиотекой `libwpa.z.so`), а не отдельным процессом. Это требует HDF: [hdf_devmgr](https://github.com/Harmony-Oneir/docs/tree/main/Graphics/Hardware%20Driver%20Foundation), хосты, конфигурацию устройств.
+В новых версиях OpenHarmony `wifi_manager` управляет `wpa_supplicant` через HDI, интерфейс драйверного фреймворка HDF. Ядро `wpa_supplicant` при этом работает внутри хоста HDF (поэтому он и собран библиотекой `libwpa.z.so`), а не отдельным процессом. Это требует HDF: [hdf_devmgr](https://github.com/Harmony-Oneir/docs/tree/main/04.Minimal%20System/Hardware%20Driver%20Foundation), хосты, конфигурацию устройств.
 
 У wifi есть флаги:
 
