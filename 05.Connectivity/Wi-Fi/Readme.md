@@ -30,10 +30,12 @@
 
 **Сервис.** `wpa_supplicant` описан как сервис init, работающий от пользователя `wifi` с правами на настройку сети. Сам он не запускается: его стартуют явно, когда в системе появляется интерфейс `wlan0`. При первой загрузке init создаёт в `/data` пустой файл конфигурации с разрешением на запись. Сеть настраивается один раз через `wpa_cli` и сохраняется командой `save_config`, после чего подключение происходит автоматически при каждой загрузке.
 
+`wpa_supplicant` ожидает файл конфигурации по пути `/data/service/el1/public/wifi/wpa_supplicant/wpa_supplicant.conf`, который устанавливается в систему через файл `wpa_supplicant.conf_module_info.json`.
+
 
 ## Тестирование в QEMU
 
-Для теста Wi-Fi через mac80211_hwsim в QEMU ничего добавлять не нужно: виртуальные адаптеры создаёт само ядро, без отдельного устройства:
+Следующая команда запуска может быть использована для запуска qemu:
 ```
 cd /mnt/ohos/OpenHarmony7
 sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G \
@@ -44,7 +46,13 @@ sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G \
   -nographic
 ```
 
-Внутри проверка интерфейсов:
+В терминале необходимо загрузить модуль `mac80211_hwsim.ko` следующей командой:
+
+```
+insmod /lib/modules/$(uname -r)/kernel/drivers/net/wireless/virtual/mac80211_hwsim.ko radios=2
+```
+
+После этого в системе появятся виртуальные интерфейсы wlan:
 ```
 # ifconfig -a
 lo        Link encap:Local Loopback  
