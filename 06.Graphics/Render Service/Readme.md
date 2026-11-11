@@ -94,4 +94,7 @@ PrintCurrentStatus: drawing is opened, gpu type is vulkan
 Режим выбирается один раз при запуске RS. `RSRenderService::InitRenderServerConfig` читает `etc/graphic/graphic_render_server_config.xml`. Парсер выставляет единый флаг `isMultiProcessModeEnabled_`. `RenderProcessManagerInit` по этому флагу создаёт один менеджер: однопроцессный (`rs_render_single_process_manager.cpp`) или многопроцессный (`rs_render_multi_process_manager.cpp`).
 
 # Запуск RS в системе
-После запуска системы, Init загрузит RS через файл `system/etc/init/graphic.cfg`.
+После запуска системы, Init загрузит RS через файл `system/etc/init/graphic.cfg`. Следующей командой можно проверить, что RS запустился:
+```bash
+ps -ef | grep render_service
+```
