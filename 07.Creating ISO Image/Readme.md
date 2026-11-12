@@ -171,6 +171,8 @@ Type=linux-generic
 Label=ohos-root
 UUID=6a1c3b2e-0000-4000-8000-0000000000a1
 CopyBlocks=/opt/ohos/ohos-root.img
+# не расширять: ФС root не растягивается, свободное место — для userdata
+Weight=0
 ```
 
 `20-userdata.conf`
