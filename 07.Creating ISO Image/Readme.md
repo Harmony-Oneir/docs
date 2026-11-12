@@ -277,3 +277,221 @@ ueventd.c:404 Get cmdline param default_boot_device : pci0000:00/0000:00:01.0
 
 > Ограничение: если SSD переставить в другой слот или в другой компьютер, PCI-путь изменится, и `/data` не смонтируется. Поэтому по умолчанию используется простой режим.
 
+
+# 9. Установочный ISO
+
+### Как это устроено
+ISO — это не OpenHarmony, а временный Debian (live-система), который загружается с флешки в оперативную память. Внутри него лежат образы OHOS и скрипт установки. Скрипт размечает SSD тем же systemd-repart, что и тестовый диск в разделе 8.
+
+```
+Флешка (ISO)
+  └─ Debian live (в RAM)
+       ├─ /opt/ohos/                 ← образы и описание разметки
+       └─ /usr/local/bin/ohos-install ← запускается на tty1 вместо входа в систему
+            выбор диска → выбор режима → подтверждение
+            → systemd-repart → resize2fs /data → перезагрузка
+```
+
+Сборка идёт в Docker (Debian trixie), чтобы версия systemd-repart в установщике совпадала с той, что проверена на тестовом диске.
+
+## 9.1. Образ со сборщиком
+`oneir/installer/livebuild/Dockerfile`:
+```dockerfile
+FROM debian:trixie
+RUN apt-get update && apt-get install -y \
+      live-build debootstrap xorriso squashfs-tools \
+      mtools dosfstools grub-efi-amd64-bin grub-pc-bin syslinux-common isolinux \
+      ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+```
+
+```bash
+sudo docker build -t oneir-livebuild oneir/installer/livebuild
+```
+Это отдельный образ от oneir-tools: live-build требует --privileged (chroot, монтирование /proc).
+
+## 9.2. Конфигурация live-системы
+
+```bash
+mkdir -p oneir/installer/live
+sudo docker run --rm --privileged -v "$PWD/oneir/installer/live":/build oneir-livebuild \
+  lb config \
+    --distribution trixie \
+    --architectures amd64 \
+    --binary-images iso-hybrid \
+    --bootloaders "grub-efi,syslinux" \
+    --debian-installer none \
+    --archive-areas "main non-free-firmware" \
+    --bootappend-live "boot=live components quiet" \
+    --iso-volume ONEIR_INSTALL \
+    --iso-application "OpenHarmony oneir installer"
+
+sudo chown -R $USER:$USER oneir/installer/live   # lb config работал от root
+```
+
+| Параметр | Зачем |
+|---|---|
+| `--distribution trixie` | тот же systemd-repart, что и в oneir-tools |
+| `--binary-images iso-hybrid` | ISO можно записать на флешку через `dd` |
+| `--bootloaders "grub-efi,syslinux"` | загрузка и в UEFI, и в BIOS |
+| `--debian-installer none` | без установщика Debian, у нас свой |
+| `non-free-firmware` | прошивки для Wi-Fi, GPU и т. п. в live-системе |
+| `--iso-volume ONEIR_INSTALL` | метка флешки |
+
+> В этой версии live-build файлы для live-системы кладутся в config/includes.chroot_after_packages/ (не includes.chroot).
+
+## 9.3. Пакеты live-системы
+`oneir/installer/live/config/package-lists/oneir-installer.list.chroot`:
+```
+# разметка и копирование образов
+systemd-repart
+dosfstools
+e2fsprogs
+mtools
+fdisk
+util-linux
+
+# сборка UKI для строгого режима
+systemd-ukify
+systemd-boot-efi
+
+# меню установщика
+whiptail
+
+# диагностика железа ноутбука
+pciutils
+usbutils
+less
+```
+
+`live.list.chroot` (`live-boot`, `live-config` и др.) создаёт `lb config`, его не трогаем.
+
+## 9.4. Командная строка ядра — один файл
+`oneir/installer/cmdline.txt` — единственное место, где хранится cmdline. Из него собирается UKI, и его же использует установщик в строгом режиме.
+```
+root=PARTUUID=6a1c3b2e-0000-4000-8000-0000000000a1 rootwait rw console=ttyS0 console=tty0 nomodeset loglevel=4 selinux=0 hardware=x86_64_oneir init=/system/bin/init
+```
+
+Сейчас это отладочный вариант. Сборка UKI:
+```bash
+sudo docker run --rm -v "$PWD":/src -w /src oneir-tools \
+  ukify build \
+    --linux out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
+    --cmdline @oneir/installer/cmdline.txt \
+    --output oneir/installer/esp/EFI/BOOT/BOOTX64.EFI
+```
+
+## 9.5. Груз OHOS: sync-payload.sh
+
+`oneir/installer/sync-payload.sh` копирует свежие артефакты в `/opt/ohos/` live-системы. Запускать после каждой пересборки ядра, UKI или образов.
+| Файл в `/opt/ohos/` | Откуда | Для чего |
+|---|---|---|
+| `esp/EFI/BOOT/BOOTX64.EFI` | `oneir/installer/esp/` | UKI для простого режима |
+| `repart.d/` | `oneir/installer/repart.d/` | разметка SSD |
+| `cmdline.txt` | `oneir/installer/cmdline.txt` | для UKI в строгом режиме |
+| `bzImage` | `out/kernel/.../bzImage` | для UKI в строгом режиме |
+| `ohos-root.img`, `userdata.img` | `out/oneir/` | сама система |
+
+```bash
+./oneir/installer/sync-payload.sh
+```
+`userdata.img` разреженный (4 ГБ по размеру, ~300 МБ по факту), копируется с `--sparse=always`.
+
+## 9.6. Скрипт установки ohos-install
+
+Файл: `oneir/installer/live/config/includes.chroot_after_packages/usr/local/bin/ohos-install`.
+Тексты на английском: в консоли live-системы нет шрифта с кириллицей.
+Порядок работы:
+1. **Выбор диска**. Список из lsblk, без флешки, с которой идёт загрузка (определяется через /run/live/medium), и без zram, loop, sr. Пункт shell выходит в bash.
+2. **Выбор режима**. simple (по умолчанию) или strict. В строгом режиме скрипт вычисляет PCI-путь диска тем же способом, что патч 0002: поднимается по sysfs до ближайшего устройства с subsystem → /sys/bus/pci.
+3. **Подтверждение** (--defaultno: случайный Enter не сотрёт диск).
+4. **Строгий режим**: ukify build с cmdline.txt + default_boot_device=<путь> во временный ESP, копия repart.d с изменённым CopyFiles=.
+5. **Разметка**: размонтирование разделов, wipefs -a, systemd-repart --empty=force.
+6. **Растягивание** /data: e2fsck -fy + resize2fs по /dev/disk/by-partuuid/...a2.
+7. **Подробный лог**: /tmp/ohos-install.log в live-системе. При ошибке или отмене скрипт выходит в bash.
+
+## 9.7. Автозапуск на tty1
+`.../etc/systemd/system/getty@tty1.service.d/zz-oneir-installer.conf`:
+```ini
+[Service]
+ExecStart=
+ExecStart=-/usr/local/bin/ohos-install
+Type=idle
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+Environment=TERM=linux
+```
+
+* Пустой ExecStart= сбрасывает agetty.
+* Префикс zz-: live-config кладёт свой drop-in для автологина, наш должен примениться последним.
+* На остальных консолях (Ctrl+Alt+F2 …) обычный live-Debian: пользователь user, пароль live.
+
+## 9.8. Сборка ISO
+
+```bash
+sudo docker run --rm --privileged -v "$PWD/oneir/installer/live":/build oneir-livebuild \
+  sh -c 'lb clean && lb config && lb build' 2>&1 | tee oneir/installer/live-build.log
+
+ls -lh oneir/installer/live/live-image-amd64.hybrid.iso
+```
+* lb clean нужен при любых изменениях: live-build пропускает уже пройденные этапы.
+* lb config после lb clean обязателен, иначе ошибка the following stage is required to be done first: config.
+* Кэш пакетов (live/cache) сохраняется, повторная сборка быстрее первой.
+* Размер ISO ~930 МБ.
+
+## 9.9. Запись на флешку
+```bash
+lsblk -d -o NAME,SIZE,MODEL,TRAN     # флешка: TRAN=usb
+sudo dd if=oneir/installer/live/live-image-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
+```
+
+# 10. Проверка установщика в QEMU
+## 10.1. Запуск
+ISO подключается как USB-флешка (не как CD), чтобы проверить, что установщик исключает её из списка дисков.
+```bash
+rm -f oneir/installer/test/blank-ssd.img
+qemu-img create -f raw oneir/installer/test/blank-ssd.img 16G
+
+sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 4G -machine q35 \
+  -bios /usr/share/ovmf/OVMF.fd \
+  -drive file=oneir/installer/test/blank-ssd.img,format=raw,if=none,id=nv0 \
+  -device nvme,drive=nv0,serial=ssd0,bootindex=1 \
+  -drive file=oneir/installer/live/live-image-amd64.hybrid.iso,format=raw,if=none,id=usb0,readonly=on \
+  -device qemu-xhci -device usb-storage,drive=usb0,bootindex=0 \
+  -vga std -display none -vnc 127.0.0.1:0 \
+  -serial mon:stdio
+```
+VNC: 127.0.0.1:5900, без пароля. С другой машины — через ssh -L 5900:127.0.0.1:5900 ....
+
+## 10.2. Проверка результата
+После установки в окне «Installation complete» нажать No (в QEMU флешку не вынуть, иначе он снова загрузится с неё) и в bash:
+```bash
+fdisk -l /dev/nvme0n1
+tail -15 /tmp/ohos-install.log
+poweroff
+```
+
+Затем загрузить OHOS с установленного диска (без флешки):
+
+```bash
+sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
+  -bios /usr/share/ovmf/OVMF.fd \
+  -drive file=oneir/installer/test/blank-ssd.img,format=raw,if=none,id=nv0 \
+  -device nvme,drive=nv0,serial=ssd0 \
+  -netdev user,id=n0,hostfwd=tcp:127.0.0.1:18710-:8710 \
+  -device e1000,netdev=n0 \
+  -device virtio-gpu-pci -vga none \
+  -display none -vnc 127.0.0.1:0 \
+  -serial mon:stdio
+```
+
+```
+ls -l /dev/block/by-name/
+df -h /data
+```
+
+После проверки можно запустить систему на железе.
