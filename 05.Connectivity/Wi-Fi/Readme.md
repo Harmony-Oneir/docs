@@ -325,5 +325,113 @@ ohos-wifiManager sta-connect --ssid oneir-test --preSharedKey testpassword
 sleep 10; ohos-wifiManager sta-getLinkedInfo
 ```
 
+# Автоподключение к Wifi для отладки
+Поскольку подключение к Wi-Fi происходит при первом сканировании, для отладки надежней всего принудительно инициировать сканирование сети. Для этого можно поместить два файла уже установленную систему:
+```bash
+hdc shell "mount -o remount,rw /"
+hdc file send ~/wifi_autoscan.sh /vendor/bin/wifi_autoscan.sh
+hdc file send ~/wifi_autoscan.cfg /vendor/etc/init/wifi_autoscan.cfg
+hdc shell "chmod 755 /vendor/bin/wifi_autoscan.sh; chmod 644 /vendor/etc/init/wifi_autoscan.cfg; ls -l /vendor/bin/wifi_autoscan.sh /vendor/etc/init/wifi_autoscan.cfg"
+```
+
+Файл `wifi_autoscan.sh`:
+```bash
+
+#!/system/bin/sh
+# Временный обход для ноутбука без графики:
+#  1. wifi_manager считает экран выключенным и не сканирует после загрузки,
+#     одного scan-start достаточно для автоподключения;
+#  2. маршрут по умолчанию OHOS кладёт в таблицу сети Wi-Fi, а hdcd отвечает
+#     через main — добавляем default в main, чтобы hdc работал из других подсетей.
+# Убрать после включения wifi_feature_screen_always_on и настройки маршрутов.
+
+W=/system/bin/cli_tool/executable/ohos-wifiManager
+GW_FALLBACK=192.168.88.1
+LOG=/data/local/tmp/wifi_autoscan.log
+
+log() { echo "$(date '+%H:%M:%S') $*" >> "$LOG"; }
+
+setup_net() {
+  # шлюз из маршрутов, которые создал NetsysNative; иначе запасной
+  GW=$(ip route show table all 2>/dev/null \
+        | sed -n 's/^default via \([0-9.]*\) dev wlan0.*/\1/p' | head -n 1)
+  [ -n "$GW" ] || GW=$GW_FALLBACK
+
+  if route -n | grep -q '^0\.0\.0\.0'; then
+    log "default route already present"
+  else
+    route add default gw "$GW" && log "default route via $GW added" \
+                               || log "route add via $GW FAILED"
+  fi
+
+  begetctl service_control stop hdcd
+  begetctl service_control start hdcd
+  log "hdcd restarted"
+}
+
+log "start"
+n=0
+while [ $n -lt 30 ]; do
+  sleep 10
+  n=$((n + 1))
+
+  if ! ifconfig wlan0 2>/dev/null | grep -q 'inet addr'; then
+    $W scan-start >/dev/null 2>&1
+    log "try $n: no IP, scan requested"
+    continue
+  fi
+
+  # IP есть — ждём 20 с и убеждаемся, что соединение устойчиво
+  sleep 20
+  if $W sta-getLinkedInfo 2>/dev/null | grep -q '"detailedState":"Connected"'; then
+    log "connected: $($W sta-getLinkedInfo 2>/dev/null)"
+    setup_net
+    exit 0
+  fi
+  log "try $n: IP present but not Connected after 20 s"
+done
+
+log "gave up after $n tries"
+exit 1
+```
+
+Файл `wifi_autoscan.cfg`:
+
+```
+{
+    "jobs" : [{
+            "name" : "boot",
+            "cmds" : ["start wifi_autoscan"]
+        }
+    ],
+    "services" : [{
+            "name" : "wifi_autoscan",
+            "path" : ["/system/bin/sh", "/vendor/bin/wifi_autoscan.sh"],
+            "uid" : "root",
+            "gid" : ["root"],
+            "once" : 1,
+            "start-mode" : "condition",
+            "apl" : "system_basic",
+            "permission" : [
+                "ohos.permission.GET_WIFI_INFO",
+                "ohos.permission.SET_WIFI_INFO",
+            		"ohos.permission.GET_WIFI_CONFIG",
+            		"ohos.permission.SET_WIFI_CONFIG",
+            		"ohos.permission.MANAGE_WIFI_CONNECTION",
+            		"ohos.permission.GET_WIFI_LOCAL_MAC",
+            		"ohos.permission.GET_WIFI_PEERS_MAC",
+            		"ohos.permission.GET_NETWORK_INFO",
+            		"ohos.permission.CONNECTIVITY_INTERNAL",
+            		"ohos.permission.INTERNET",
+            		"ohos.permission.LOCATION",
+            		"ohos.permission.APPROXIMATELY_LOCATION",
+            		"ohos.permission.cli.MANAGE_WIFI_SCAN",
+            		"ohos.permission.cli.MANAGE_WIFI_CONNECT"
+            ]
+        }
+    ]
+}
+```
+
 # DHCP-сервер
 DHCP-сервер OpenHarmony сделан как SA (`1127`) и работает внутри процесса `wifi_manager_service`. Но это не самостоятельный сервис, который можно направить на любой интерфейс: им управляет сам `wifi_manager` через `dhcp_sdk`. Он запускает DHCP-сервер, когда включается режим точки доступа (SA `1121`, `WifiHotspot`), и раздаёт адреса устройствам, подключившимся к раздаче Wi-Fi с этого устройства.
