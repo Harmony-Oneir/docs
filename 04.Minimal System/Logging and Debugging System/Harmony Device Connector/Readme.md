@@ -110,3 +110,9 @@ hdc shell                           # удалённый шелл
 hdc file send <файл> <путь>         # передать файл на устройство
 hdc file recv <путь> <файл>         # забрать файл с устройства
 ```
+
+Следующими командами можно перезагрузить сервис:
+```
+begetctl service_control stop hdcd
+begetctl service_control start hdcd
+```
