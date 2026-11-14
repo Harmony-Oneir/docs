@@ -435,3 +435,55 @@ exit 1
 
 # DHCP-сервер
 DHCP-сервер OpenHarmony сделан как SA (`1127`) и работает внутри процесса `wifi_manager_service`. Но это не самостоятельный сервис, который можно направить на любой интерфейс: им управляет сам `wifi_manager` через `dhcp_sdk`. Он запускает DHCP-сервер, когда включается режим точки доступа (SA `1121`, `WifiHotspot`), и раздаёт адреса устройствам, подключившимся к раздаче Wi-Fi с этого устройства.
+
+# Раздача Wi-Fi
+Режим точки доступа (SoftAP) и раздача интернета с устройства. Проводная сеть при этом служит источником интернета (upstream), а Wi-Fi — раздающим интерфейсом. Для отладки удобно подключаться к стенду по hdc через `eth0`: при переключении `wlan0` в режим точки доступа связь не теряется.
+
+```
+ eth0 (интернет) ──NAT──► wlan0 (точка доступа) ◄── клиенты
+       ▲                       ▲
+ netmanager:              wifi_manager_service:
+ SA 1154 NetworkShare     SA 1121 WifiHotspot → HDI hostapd_host → ap_main() из libwpa.z.so
+ (iptables MASQUERADE,    SA 1127 DhcpServer — раздаёт адреса клиентам
+  ip_forward, маршруты)
+```
+
+## Проверка адаптера
+
+Поддержку режима точки доступа можно проверить у запущенного `wpa_supplicant`, без `iw`:
+
+```sh
+/vendor/bin/wpa_cli -p /data/service/el1/public/wifi/sockets/wpa -i wlan0 driver_flags
+```
+
+В списке должны быть `AP` и `AP_MLME`.
+
+## Состав
+
+| Часть | Цель / файл | SA, процесс | Состояние |
+|---|---|---|---|
+| Точка доступа | `libwifi_hotspot_ability.z.so`, `libwifi_ap_service.z.so` | 1121, `wifi_manager_service` | в образе |
+| HDI hostapd | `//drivers/peripheral/wlan/hostapd:hostapd_entry`, хост `hostapd_host` в `device_info.hcs` (`preload = 2`) | хост HDF, по запросу | в образе |
+| Ядро hostapd | `libwpa.z.so` (функция `ap_main`) | внутри `hostapd_host` | в образе (`/vendor/lib64`) |
+| Конфиги hostapd | `hostapd.conf`, `hostapd_coex.conf` → `system/etc/wifi/` (собираются через `relation_services`) | — | добавить в образ |
+| DHCP-сервер | `//foundation/communication/dhcp/services/dhcp_server:dhcp_server` | 1127, `wifi_manager_service` | добавить |
+| Общий доступ (NAT) | `//foundation/communication/netmanager_ext/services/networksharemanager:net_tether_manager` | 1154, `netmanager` | добавить |
+| Конфиг общего доступа | `...networksharemanager:network_share_config` | — | добавить |
+| Утилита | `//foundation/communication/netmanager_ext/tools/ohos-networkShare:ohos-networkShare` | — | добавить |
+| Модули NAT | `iptable_nat.ko`, `xt_MASQUERADE.ko`, `xt_nat.ko` в `/lib/modules/6.6.101/kernel/net/` | ядро | в образе |
+
+Исполняемые файлы `/vendor/bin/hostapd` и `hostapd_cli` для работы через `wifi_manager` не нужны: HDI-служба вызывает `ap_main()` из `libwpa.z.so` внутри своего процесса. Отдельный `hostapd` нужен только для ручных тестов (например, точка доступа на `mac80211_hwsim` в QEMU).
+
+## Сборка
+
+Сборка происходит в контейнере:
+```sh
+./oneir/make.sh hotspot
+```
+
+## Профили SA
+
+| Профиль | Добавить |
+|---|---|
+| `oneir/profile/wifi_manager_service.json` | SA `1127` (`libdhcp_server.z.so`) из `dhcp/services/sa_profile/profiles/1127.json` |
+| `oneir/profile/netmanager.json` | SA `1154` (`libnet_tether_manager.z.so`) из `netmanager_base/sa_profile/profiles/1154.json` |
