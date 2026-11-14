@@ -2,6 +2,43 @@
 
 # netmanager_ext
 Компонент расширений сетевого стека (`foundation/communication/netmanager_ext`). Дополняет `netmanager_base` (менеджер подключений, политики, статистика, `netsysnative`) службами для отдельных видов сетей и сетевых функций. На данном этапе нужна служба **Ethernet**: она обнаруживает проводные интерфейсы (`eth0`), получает для них адрес по DHCP (через службу DHCP) и регистрирует сеть в `netmanager`, после чего `netsysnative` создаёт маршруты, настраивает DNS и начинает учёт трафика. Без неё проводной интерфейс приходится настраивать вручную, и для сетевого стека OpenHarmony он остаётся «невидимым»: нет маршрута по умолчанию, DNS и статистики трафика.
+
+# Общая схема
+```
+ USB-адаптер / PCI-сетевая карта
+        │ uevent (add, modalias)
+        ▼
+ ┌─ ядро 6.6 ──────────────────────────────────────────────────────────────┐
+ │  ueventd_module_loader ── modules.alias ──► insmod r8152 / usbnet /     │
+ │  (автозагрузка модулей)                     cdc_ether / ...             │
+ │                                                    │                    │
+ │                                                    ▼                    │
+ │                                                  eth0                   │
+ └──────────────────────────────────────────────────▲───────▲──────────────┘
+                                                    │       │
+                         netlink, ioctl, iptables   │       │ DHCP (raw socket)
+                                                    │       │
+ ┌─ netsysnative (SA 1158) ─────────────────────┐   │   ┌─ wifi_manager_service ──────────┐
+ │ libnetsys_native_manager                     │───┘   │ SA 1126 DhcpClient              │
+ │ маршруты и ip rule по сетям, iptables,       │       │   libdhcp_client  (по запросу)  │
+ │ DNS-прокси (сокет dnsproxyd), fwmarkd, BPF   │       │ WifiNetAgent: сеть Wi-Fi        │
+ └──────────────────────▲───────────────────────┘       │   (supplier 1003)               │
+                        │ NetsysController (IPC)        └────────▲───────────────┬────────┘
+                        │                                        │ DhcpSdk (IPC) │ регистрация
+ ┌─ netmanager ─────────┴────────────────────────────────────────┴───────────┐   │ сети Wi-Fi
+ │ SA 1157 EthernetService  libethernet_manager                              │   │
+ │   читает ethernet_interfaces.json, следит за eth*, запускает DHCP,        │   │
+ │   регистрирует проводную сеть (supplier 1004)                             │   │
+ │        │                                                                  │   │
+ │        ▼                                                                  │   │
+ │ SA 1151 NetConnManager  libnet_conn_manager   ◄───────────────────────────┼───┘
+ │   выбор лучшей сети, проверка доступа (netdetectionurl.conf)              │
+ │ SA 1152 NetPolicy        SA 1153 NetStats                                 │
+ └───────────────────────────────────────────────────────────────────────────┘
+        ▲ запуск: init (netmanager_base.cfg, netsysnative.cfg), регистрация SA: samgr
+```
+Порядок событий: адаптер подключён → ueventd грузит драйвер → появляется eth0 → EthernetService поднимает интерфейс и просит адрес у DhcpClient (SA 1126) → адрес назначен на eth0 → EthernetService регистрирует сеть в NetConnManager → NetConnManager через netsysnative создаёт сеть (netId), маршруты и DNS, выполняет проверку доступа и выбирает основную сеть.
+
 ## Состав
 
 | Часть | Группа сборки (`service_group`) | Флаг |
@@ -25,6 +62,9 @@
 | 8400 | `netmanager` | `libwearable_distributed_net_manager.z.so` | нет |
 
 Профиля службы Ethernet среди профилей `netmanager_ext` нет: её системная способность описана в профилях `netmanager_base` и работает в общем процессе `netmanager`.
+
+## Сборка
+Для сборки используйте команду `./make.sh net_all` в контейнере. 
 
 ## Конфигурация
 
