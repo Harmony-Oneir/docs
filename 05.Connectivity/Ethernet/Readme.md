@@ -68,8 +68,8 @@
 
 ## Конфигурация
 
-| Файл | Назначение |
-| --- | --- |
-| `services/etc/init/ethernet.cfg` | Задания init для службы Ethernet (каталоги, права) |
-| `services/ethernetmanager/config/ethernet_interfaces.json` | Список проводных интерфейсов и способ их настройки (DHCP или статический адрес) |
-| `services/etc/init/vpnmanager.cfg`, `mdnsmanager.cfg` | Процессы VPN и mDNS |
+| Файл | Что в штатной описи | 
+|---|---|
+| `services/etc/init/ethernet.cfg` | Задания init для службы Ethernet (каталоги, права). |
+| `services/ethernetmanager/config/ethernet_interfaces.json` | Список проводных интерфейсов и способ настройки — DHCP или статический адрес. |
+| `services/etc/init/vpnmanager.cfg`, `mdnsmanager.cfg` | Процессы VPN и mDNS. | 
