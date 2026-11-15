@@ -487,3 +487,76 @@ DHCP-сервер OpenHarmony сделан как SA (`1127`) и работае�
 |---|---|
 | `oneir/profile/wifi_manager_service.json` | SA `1127` (`libdhcp_server.z.so`) из `dhcp/services/sa_profile/profiles/1127.json` |
 | `oneir/profile/netmanager.json` | SA `1154` (`libnet_tether_manager.z.so`) из `netmanager_base/sa_profile/profiles/1154.json` |
+
+
+# Запустить раздачу
+Утилиты лежат вне PATH:
+```bash
+export PATH=$PATH:/system/bin/cli_tool/executable
+```
+
+Клиент Wi-Fi нужно выключить заранее, иначе `hostapd` не сможет перевести `wlan0` в режим точки доступа (`Resource busy`):
+```bash
+ohos-wifiManager sta-disable
+sleep 5
+ohos-networkShare start --type wifi
+sleep 8
+ohos-networkShare is-sharing
+```
+Ожидается `"sharing":true`, у `wlan0` адрес `192.168.43.1/24`.
+
+## Имя сети и пароль
+Настройки точки доступа хранит `wifi_manager`:
+
+```bash
+cat /data/service/el1/public/wifi/hotspot_config.conf
+```
+
+## Остановить раздачу
+```bash
+ohos-networkShare stop --type wifi
+ohos-wifiManager sta-enable
+```
+
+`sta-enable` возвращает Wi-Fi в режим клиента.
+
+## Проверить, что раздача работает
+
+```bash
+# состояние раздачи и адрес точки доступа
+ohos-networkShare is-sharing
+ifconfig wlan0 | grep 'inet addr'
+
+# процессы: hostapd_host поднимается по запросу при включении раздачи
+for p in /proc/[0-9]*; do c=$(cat $p/cmdline 2>/dev/null | sed 's/\x0/ /g'); case "$c" in *hostapd_host*|*wifi_manager*|*netmanager*|*netsysnative*) echo "${p#/proc/} $c";; esac; done
+
+# состояние точки доступа: 3 — запущена, 4 — ошибка
+hilog -x | grep 'OnHotspotStateChanged state' | tail -3
+
+# NAT, настроенный службой общего доступа
+iptables -t nat -S POSTROUTING; cat /proc/sys/net/ipv4/ip_forward
+
+# клиенты: аренды DHCP и таблица ARP
+cat /data/service/el1/public/dhcp/dhcpd_lease.lease.wlan0
+cat /proc/net/arp
+```
+
+## Необходимые системные способности
+
+| SA | Процесс | Библиотека | Назначение |
+|---:|---|---|---|
+| 1121 | `wifi_manager_service` | `libwifi_hotspot_ability.z.so` | Точка доступа (WifiHotspot) |
+| 1127 | `wifi_manager_service` | `libdhcp_server.z.so` | DHCP-сервер |
+| 1154 | `netmanager` | `libnet_tether_manager.z.so` | Общий доступ: NAT, маршруты |
+| 1151 | `netmanager` | `libnet_conn_manager.z.so` | Менеджер подключений |
+| 1158 | `netsysnative` | `libnetsys_native_manager.z.so` | `iptables`, маршруты, `ip_forward` |
+
+Хосты HDF: `wifi_host` (`chip_interface_service`) и `hostapd_host` (`hostapd_interface_service`, `ondemand`).
+
+SA 1127 и 1154 добавлены в профили `oneir/profile/wifi_manager_service.json` и `oneir/profile/netmanager.json`. Для `libnet_tether_manager` в образ также нужны клиентские библиотеки `libbtframework.z.so`, `libbtcommon.z.so`, `libusbsrv_client.z.so` и `libnet_tether_manager_if.z.so`.
+
+Для запуска `ohos-networkShare` из `hdc shell` в `hdcd.cfg` добавлены разрешения `ohos.permission.CONNECTIVITY_INTERNAL`, `ohos.permission.cli.GET_HOTSPOT`, `ohos.permission.cli.SET_HOTSPOT`, `ohos.permission.MANAGE_WIFI_HOTSPOT`, `ohos.permission.GET_WIFI_CONFIG` — в списки `permission` и `permission_acls` (у `hdcd apl: normal`).
+
+## Патчи
+* `oneir/oneir_patches/drivers_peripheral/0001-wlan-chip-country-code-mode.patch` — флаг `drivers_peripheral_wlan_feature_country_code_mode` (в `oneir.json: "auto"`), установка кода страны стандартной командой `NL80211_CMD_REQ_SET_REG`.
+* `oneir/oneir_patches/foundation_communication_dhcp/0001-dhcp-server-reply-length-and-end-option.patch` — длина заголовка DHCP 236 вместо 234 и запись опции `END`; без него Android не получает адрес.
