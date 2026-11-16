@@ -28,4 +28,17 @@ oneir/firmware/linux-firmware/qca/rampatch_usb_00000302.bin
 oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 ```
 
-Для сборки сервисов используйте команду `./make.sh oneir_bluetooth` в контейнере.
+# Сборка
+Для сборки сервисов используйте команду `./make.sh oneir_bluetooth` в контейнере. Результат сборки находится в каталогах 
+
+**bluetooth hdi**:
+
+* `out/oneir/hdf/drivers_interface_bluetooth/`
+
+**bluetooth service**:
+
+* `out/oneir/communication/bluetooth_service/`
+
+**bluetooth client**:
+
+* `out/oneir/communication/bluetooth/`
