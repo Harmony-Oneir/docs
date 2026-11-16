@@ -42,3 +42,5 @@ oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 **bluetooth client**:
 
 * `out/oneir/communication/bluetooth/`
+
+SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/bluetooth_service.json)
