@@ -43,4 +43,4 @@ oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 
 * `out/oneir/communication/bluetooth/`
 
-SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/bluetooth_service.json)
+SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/bluetooth_service.json). После запуска, Init загружает `foundation/communication/bluetooth_service/services/bluetooth/etc/init/bluetooth_service.cfg`.
