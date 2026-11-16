@@ -27,3 +27,5 @@ echo "== 7. dmesg"; dmesg | grep -iE "bluetooth|btusb|hci0|qca" | tail -15
 oneir/firmware/linux-firmware/qca/rampatch_usb_00000302.bin
 oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 ```
+
+Для сборки сервисов используйте команду `./make.sh oneir_bluetooth` в контейнере.
