@@ -21,3 +21,9 @@ echo "== 5. загружено"; lsmod | grep -E "^(bluetooth|btusb|btintel|btbc
 echo "== 6. контроллер"; ls /sys/class/bluetooth; cat /sys/class/rfkill/*/type
 echo "== 7. dmesg"; dmesg | grep -iE "bluetooth|btusb|hci0|qca" | tail -15
 ```
+
+Необходимые прошивки для Bluetooth модуля модуля:
+```
+oneir/firmware/linux-firmware/qca/rampatch_usb_00000302.bin
+oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
+```
