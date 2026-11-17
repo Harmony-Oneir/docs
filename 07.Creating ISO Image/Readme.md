@@ -495,3 +495,28 @@ df -h /data
 ```
 
 После проверки можно запустить систему на железе.
+
+# Пересборка
+После изменения bzImage необходимо пересобрать UKI:
+```sudo docker run --rm -v "$PWD":/src -w /src oneir-tools \
+  ukify build \
+    --linux out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
+    --cmdline @oneir/installer/cmdline.txt \
+    --output oneir/installer/esp/EFI/BOOT/BOOTX64.EFI
+```
+Обновить груз установщика — копирует UKI, bzImage, cmdline.txt, repart.d и оба образа в /opt/ohos/ live-системы:
+```
+./oneir/installer/sync-payload.sh
+```
+Собрать ISO:
+```
+sudo docker run --rm --privileged -v "$PWD/oneir/installer/live":/build oneir-livebuild \
+  sh -c 'lb clean && lb config && lb build' 2>&1 | tee oneir/installer/live-build.log
+ls -lh oneir/installer/live/live-image-amd64.hybrid.iso
+```
+
+Записать на флешку:
+```
+lsblk -d -o NAME,SIZE,MODEL,TRAN          # флешка — TRAN=usb
+sudo dd if=oneir/installer/live/live-image-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
+```
