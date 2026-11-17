@@ -3,4 +3,4 @@
 # Сборка
 Для сборки используйте команду `./make.sh hidumper` в контейнере. 
 
-SA профиль: [hidumper_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/hidumper_service.json).
+SA профиль: [hidumper_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/hidumper_service.json). После запуска системы, Init загружает файл `hidumper_service.cfg`.
