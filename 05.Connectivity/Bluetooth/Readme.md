@@ -44,3 +44,12 @@ oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 * `out/oneir/communication/bluetooth/`
 
 SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/bluetooth_service.json). После запуска, Init загружает `foundation/communication/bluetooth_service/services/bluetooth/etc/init/bluetooth_service.cfg`.
+
+
+
+# Управление bluetooth через CLI
+
+Инструмент управления bluetooth находится по пути `/system/bin/cli_tool/executable/ohos-bluetoothTool`:
+
+* **Посмотреть состояние**: ohos-bluetoothTool get-state
+* **Включить**: ohos-bluetoothTool enable-bt
