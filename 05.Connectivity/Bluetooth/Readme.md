@@ -53,3 +53,30 @@ SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir
 
 * **Посмотреть состояние**: ohos-bluetoothTool get-state
 * **Включить**: ohos-bluetoothTool enable-bt
+
+
+# Bluetooth Host
+
+`bluetooth_host` — это отдельный процесс HDF, в котором живёт драйвер HCI (`libbluetooth_hci_hdi_driver.z.so`) и публикуется HDI-сервис `hci_interface_service`. Через этот сервис служба `bluetooth_service` получает доступ к контроллеру: стек сам с железом не работает, он только вызывает `IHciInterface::Get()` и обменивается с ним HCI-пакетами (команды, события, ACL, SCO). Хост отделяет стек от железа. Внутри него HDI-драйвер загружает vendor-библиотеку (`libbt_vendor.z.so`), которая знает конкретный транспорт до контроллера — у нас это сокет `HCI_CHANNEL_USER` на `hci0`, на других платах UART. Поэтому смена железа требует замены только vendor-библиотеки, а стек и служба остаются прежними. Кроме того, хост работает в отдельном процессе со своими правами (`NET_ADMIN`/`NET_RAW` для сокета): при падении драйвера страдает только он, а не служба Bluetooth или система целиком. Без `bluetooth_host` у стека нет адресата, и именно поэтому мы получали `hdiInit failed: 2`.
+
+**HCS-запись хоста**. В [device_info.hcs](https://github.com/Harmony-Oneir/oneir/blob/main/hdf_config/uhdf/device_info.hcs):
+```
+        /* Bluetooth: HCI HDI, контроллер QCA9377 под btusb, доступ через HCI_CHANNEL_USER в libbt_vendor. */
+        bluetooth :: host {
+            hostName = "bluetooth_host";
+            priority = 50;
+            caps = ["NET_ADMIN", "NET_RAW"];
+            uid = "bluetooth";
+            gid = ["bluetooth"];
+            bluetooth_device :: device {
+                device0 :: deviceNode {
+                    policy = 2;
+                    priority = 100;
+                    moduleName = "libbluetooth_hci_hdi_driver.z.so";
+                    serviceName = "hci_interface_service";
+                }
+            }
+        }
+```
+
+> После изменения пересборка `./make.sh oneir/hdf_config/uhdf:hdf_config`. `hdf_config` собирает `hdf_default.hcb` и `hdf_devhost.cfg` из `hdf.hcs`. В образ оба файла попадают через `minimal_system_deps.json` / `connectivity_wifi_deps.json`.
