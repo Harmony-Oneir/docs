@@ -46,15 +46,6 @@ oneir/firmware/linux-firmware/qca/nvm_usb_00000302.bin
 SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir/blob/main/profile/bluetooth_service.json). После запуска, Init загружает `foundation/communication/bluetooth_service/services/bluetooth/etc/init/bluetooth_service.cfg`.
 
 
-
-# Управление bluetooth через CLI
-
-Инструмент управления bluetooth находится по пути `/system/bin/cli_tool/executable/ohos-bluetoothTool`:
-
-* **Посмотреть состояние**: ohos-bluetoothTool get-state
-* **Включить**: ohos-bluetoothTool enable-bt
-
-
 # Bluetooth Host
 
 `bluetooth_host` — это отдельный процесс HDF, в котором живёт драйвер HCI (`libbluetooth_hci_hdi_driver.z.so`) и публикуется HDI-сервис `hci_interface_service`. Через этот сервис служба `bluetooth_service` получает доступ к контроллеру: стек сам с железом не работает, он только вызывает `IHciInterface::Get()` и обменивается с ним HCI-пакетами (команды, события, ACL, SCO). Хост отделяет стек от железа. Внутри него HDI-драйвер загружает vendor-библиотеку (`libbt_vendor.z.so`), которая знает конкретный транспорт до контроллера — у нас это сокет `HCI_CHANNEL_USER` на `hci0`, на других платах UART. Поэтому смена железа требует замены только vendor-библиотеки, а стек и служба остаются прежними. Кроме того, хост работает в отдельном процессе со своими правами (`NET_ADMIN`/`NET_RAW` для сокета): при падении драйвера страдает только он, а не служба Bluetooth или система целиком. Без `bluetooth_host` у стека нет адресата, и именно поэтому мы получали `hdiInit failed: 2`.
@@ -78,6 +69,14 @@ SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir
             }
         }
 ```
+
+
+# Управление bluetooth через CLI
+
+Инструмент управления bluetooth находится по пути `/system/bin/cli_tool/executable/ohos-bluetoothTool`:
+
+* **Посмотреть состояние**: ohos-bluetoothTool get-state
+* **Включить**: ohos-bluetoothTool enable-bt
 
 > После изменения пересборка `./make.sh oneir/hdf_config/uhdf:hdf_config`. `hdf_config` собирает `hdf_default.hcb` и `hdf_devhost.cfg` из `hdf.hcs`. В образ оба файла попадают через `minimal_system_deps.json` / `connectivity_wifi_deps.json`.
 
