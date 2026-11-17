@@ -80,3 +80,5 @@ SA сервис: [bluetooth_service.json](https://github.com/Harmony-Oneir/oneir
 ```
 
 > После изменения пересборка `./make.sh oneir/hdf_config/uhdf:hdf_config`. `hdf_config` собирает `hdf_default.hcb` и `hdf_devhost.cfg` из `hdf.hcs`. В образ оба файла попадают через `minimal_system_deps.json` / `connectivity_wifi_deps.json`.
+
+Для работы ядра хостовой части необходимо скомпилировать [bt_vendor_oneir](https://github.com/Harmony-Oneir/bt_vendor_oneir/tree/main). Данная цель является частью группы `oneir_bluetooth`.
