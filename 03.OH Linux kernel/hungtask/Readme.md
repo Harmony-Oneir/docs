@@ -10,3 +10,9 @@ CONFIG_DETECT_HUNG_TASK=y
 CONFIG_DFX_HUNGTASK=y
 CONFIG_DFX_HUNGTASK_USER=y
 ```
+
+Сопутствующие опции, которые лучше оставить по умолчанию (в defconfig их можно не писать):
+```
+# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set   # не паниковать при зависшей D-задаче
+CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=120            # порог khungtaskd, секунды
+```
