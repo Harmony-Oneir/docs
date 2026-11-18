@@ -1,0 +1,1 @@
+ressched (Resource Schedule Service, `resource_schedule_service`) — системная служба подсистемы `resourceschedule`. Её задача — собирать события о том, что происходит в системе, и по ним управлять ресурсами: приоритетами процессов, cgroup, частотами CPU и так далее.
