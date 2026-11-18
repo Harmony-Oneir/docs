@@ -5,3 +5,5 @@
 
 Обе подсистемы — дополнения OpenHarmony к ядру (`drivers/staging/`), в mainline
 Linux их нет.
+
+> Для LiteOS (mini/small) есть отдельная библиотека `base/hiviewdfx/blackbox` с той же схемой (`BBoxNotifyError`, `SystemModule*`) — к Linux-ядру отношения не имеет.
