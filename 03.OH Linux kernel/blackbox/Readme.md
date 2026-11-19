@@ -108,3 +108,21 @@ faultloggerd (`kernel_snapshot_task.cpp:36`) ждёт `/sys/kbox/snapshot_clear`
 - паника ядра — blackbox или штатный pstore;
 - зависания служб — hicollie;
 - сбор и анализ — hiview.
+
+
+### Модули blackbox
+
+В открытом коде только один — системный (`MODULE_SYSTEM`): `rockchip/system_adapter.c`,
+`rockchip/system_adapter_by_memory.c` и наш `x86/system_adapter.c`. Модули чипсета,
+модема и т.п. у производителей устройств закрытые.
+
+Модуль = `struct module_ops` (`include/linux/blackbox.h`): имя, `dump` (при сбое),
+`reset` (перед перезагрузкой), `get_last_log_info` (после загрузки: был ли сбой),
+`save_last_log` (запись лога). О сбое сообщает `bbox_notify_error(event, module, desc,
+need_sys_reset)`. Схема та же, что у LiteOS-версии (`SystemModule*`, `BBoxNotifyError`).
+
+Системный модуль шлёт `EVENT_PANIC`, а также `EVENT_SYSREBOOT` и `EVENT_POWEROFF` —
+вероятно, записывается и штатная перезагрузка (проверить обычным `reboot` до теста паники).
+
+`bbox_register_module_ops` и `bbox_notify_error` не экспортированы: свои модули
+только встроенные (`=y`), из `.ko` без патча с `EXPORT_SYMBOL` не зарегистрироваться.
