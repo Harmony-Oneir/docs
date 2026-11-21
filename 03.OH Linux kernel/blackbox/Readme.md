@@ -211,7 +211,7 @@ sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
   -device nvme,serial=oneir,drive=nvm \
   -netdev user,id=n0,hostfwd=tcp:127.0.0.1:18710-:8710 \
   -device e1000,netdev=n0 \
-  -append 'root=/dev/nvme0n1p1 rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init loglevel=4 memmap=1M$0x70000000 ramoops.mem_address=0x70000000 ramoops.mem_size=0x100000 ramoops.record_size=0x20000 ramoops.blackbox_size=0x40000 ramoops.ecc=1 panic=5' \
+  -append 'root=/dev/nvme0n1p1 rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init loglevel=4 bbox_ramoops=auto panic=5' \
   -nographic -device virtio-gpu-pci
 ```
 
