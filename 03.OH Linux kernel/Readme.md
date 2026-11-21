@@ -21,6 +21,7 @@ patch -p1 --forward --no-backup-if-mismatch < $KP
 * [0001-qos_auth-include-linux-compat.h-for-compat_ptr.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/common_modules/0001-qos_auth-include-linux-compat.h-for-compat_ptr.patch)
 * `0008-blackbox-add-x86-system-adapter.patch`
 * `0009-blackbox-read-pstore-record-on-linux-6.6.patch`
+* `0010-blackbox-x86-automatic-ramoops-region.patch`
   
 Для сборки ядра выполните следующую команду из контейнера сборки:
 ```bash
