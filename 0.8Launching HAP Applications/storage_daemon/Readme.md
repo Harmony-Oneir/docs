@@ -63,3 +63,4 @@
 # Сборка
 
 Для сборки используйте команду `./make.sh storage` в контейнере. После запуска Init откроет файл `storage_daemon.cfg` по пути `system/etc/init/`.
+Для сборки тестов используйте команду `./make.sh storage_tests`.
