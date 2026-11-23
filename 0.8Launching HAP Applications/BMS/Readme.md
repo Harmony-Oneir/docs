@@ -52,3 +52,6 @@ BMS (Bundle Manager Service, подсистема bundlemanager, компоне�
 | `api_metrics_enable` | `true` | Метрики вызовов API |
 | `bms_accesscontrol_sandbox_manager` | `false` | Sandbox Manager для контроля доступа (auto-detect) |
 | `use_pre_bundle_profile` | `true` | Использование предустановленного профиля пакетов |
+
+# Сборка
+Для сборки используйте команду `./make.sh bms` в контейнере. У BMS своего cfg нет. Он стартует внутри процесса foundation, а этот процесс описан в `foundation.cfg`: sa_main `/system/profile/foundation.json`.
