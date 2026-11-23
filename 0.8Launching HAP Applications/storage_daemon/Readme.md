@@ -196,3 +196,45 @@
 - `DirExist`
 - `UMountByListWithDetach`
 - Сценарии «второго монтирования»: `*SecondMount*`, `IsBundleNeedClear`
+
+---
+
+# `storage_daemon_clt_test`: `StorageDaemonClientTest`
+
+Тесты обращаются к работающему демону через SA 5002.
+
+### Пользователи
+- `PrepareUserDirs`
+- `StartUser`
+- `StopUser`
+- `DestroyUserDirs`
+- `PrepareUserSpace`
+- `DestroyUserSpace`
+- `GetUserNeedActiveStatus`
+
+### Ключи и шифрование
+- `InitGlobalKey`
+- `InitGlobalUserKeys`
+- `ActiveUserKey` / `InactiveUserKey`
+- `UpdateUserAuth`
+- `UpdateKeyContext`
+- `CreateRecoverKey` / `SetRecoverKey`
+- `GenerateAppkey` / `DeleteAppkey`
+- `SetDirEncryptionPolicy`
+- `FscryptEnable`
+- `GetFileEncryptStatus`
+- `EraseAllUserEncryptedKeys`
+
+### Экран блокировки
+- `LockUserScreen`
+- `UnlockUserScreen`
+- `GetLockScreenStatus`
+
+### Прочее
+- `CheckServiceStatus`
+- `GetStorageDaemonProxy`
+- `IsFileOccupied`
+- `ListUserdataDirInfo`
+- `MountDfsDocs` / `UMountDfsDocs`
+- `MountFileMgrFuse` / `UMountFileMgrFuse`
+- `NewErrBranches_*` — передача неверных аргументов
