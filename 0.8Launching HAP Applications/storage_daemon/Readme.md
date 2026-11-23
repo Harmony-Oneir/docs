@@ -238,3 +238,11 @@
 - `MountDfsDocs` / `UMountDfsDocs`
 - `MountFileMgrFuse` / `UMountFileMgrFuse`
 - `NewErrBranches_*` — передача неверных аргументов
+
+## Запустить тесты
+
+```bash
+mkdir -p /data/local/tmp/st && cd /data/local/tmp/st
+T=/system/tests/storage
+$T/string_utils_test
+```
