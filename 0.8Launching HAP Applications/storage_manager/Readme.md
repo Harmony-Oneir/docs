@@ -2,4 +2,4 @@
 
 
 # Сборка
-Для сборки используйте команду `./make.sh storage_manager` в контейнере. 
+Для сборки используйте команду `./make.sh storage_manager` в контейнере. При запуске системы, Init загружает `storage_manager` через `storage_manager.cfg`, который в своею очередь загружает SA профиль `storage_manager.json`.
