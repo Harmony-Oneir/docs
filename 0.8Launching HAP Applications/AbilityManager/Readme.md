@@ -44,9 +44,27 @@ hidumper -s 200 -a '-os_account_infos'
 hilog -x -D 0xD001B00 -L I,W,E | tail -30
 hilog -x -P $(pidof foundation) -L W,E | tail -40
 ```
-Что ожидаем:
+Что ожидаем на текущем этапе (лаунчер и другие HAP ещё не установлены):
 
-* В списке SA появились AbilityManagerService (180) и AppMgrService (501).
-* Счётчик библиотек в foundation больше 0.
-* У аккаунта 100 Status: active и isForeground: 1.
-* В логе accountmgr есть ActivateDefaultOsAccount без ошибки.
+* В списке SA есть `AbilityManagerService` (180) и `ApplicationManagerService` (501).
+* Счётчик библиотек в `foundation` больше 0: `libabilityms` и `libappms` загружены.
+* В `-a -u 100` есть `User ID #100` со списками задач (`LAUNCHER`, `DEFAULT_STANDARD`,
+  `DEFAULT_SINGLE`), но они **пустые**. Значит, AMS получил `StartUser` и создал структуры пользователя.
+* В `-r` нет ни одного процесса приложения.
+* У аккаунта 100 `Status: inactive`, `isForeground: 0`. **Пока это ожидаемо**, причина описана ниже.
+* В логе `foundation` каждые ~200 мс повторяется
+  `BMSQuery: ImplicitQueryAbilityInfos ... bundleInfos_ is empty`: AMS ищет лаунчер и не находит.
+
+# Почему аккаунт 100 не становится active
+
+`accountmgr` активирует аккаунт по `OnAddSystemAbility(180)`: вызывает `StartUser` у AMS и ждёт колбэк
+(`os_account_interface.cpp`, `SendToAMSAccountStart`, `onStartCondition_.wait`) **без таймаута**.
+AMS вызывает колбэк только после запуска домашнего приложения пользователя. Пока в образе нет
+ни одного HAP, лаунчер не находится, колбэк не приходит, и поток `accountmgr` висит в `futex_wait`.
+
+При этом ожидание идёт под `statusMutex_` внутри `OnAddSystemAbility`, поэтому последующие
+уведомления о SA для `accountmgr` тоже блокируются. На запросы (дамп, подписки) служба отвечает
+нормально, и со стороны выглядит живой.
+
+Аккаунт станет `active` (`isForeground: 1`), когда в образе будут `installs` (SA 511),
+`appspawn` и установленный HAP лаунчера.
