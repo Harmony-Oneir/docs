@@ -34,3 +34,19 @@ sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
   -append 'root=/dev/nvme0n1p1 rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init loglevel=4 bbox_ramoops=auto panic=5' \
   -nographic -device virtio-gpu-pci
 ```
+
+Проверка:
+
+```bash
+hidumper -ls
+cat /proc/$(pidof foundation)/maps | grep -cE 'libabilityms|libappms'
+hidumper -s 200 -a '-os_account_infos'
+hilog -x -D 0xD001B00 -L I,W,E | tail -30
+hilog -x -P $(pidof foundation) -L W,E | tail -40
+```
+Что ожидаем:
+
+* В списке SA появились AbilityManagerService (180) и AppMgrService (501).
+* Счётчик библиотек в foundation больше 0.
+* У аккаунта 100 Status: active и isForeground: 1.
+* В логе accountmgr есть ActivateDefaultOsAccount без ошибки.
