@@ -27,3 +27,17 @@ rm -f $D && truncate -s $(( RM + UM + 2 ))M $D
 dd if=$R of=$D bs=1M seek=1 conv=notrunc status=none
 dd if=$U of=$D bs=1M seek=$(( 1 + RM )) conv=notrunc status=none
 ```
+Диск собирается из чистого userdata.img, так что аккаунт 100 будет создан заново.
+
+Запуск:
+```bash
+cd /mnt/ohos/OpenHarmony7
+sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
+  -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
+  -drive file=/tmp/oneir-gpt.img,format=raw,if=none,id=nvm \
+  -device nvme,serial=oneir,drive=nvm \
+  -netdev user,id=n0,hostfwd=tcp:127.0.0.1:18710-:8710 \
+  -device e1000,netdev=n0 \
+  -append 'root=/dev/nvme0n1p1 rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init loglevel=4 bbox_ramoops=auto panic=5' \
+  -nographic -device virtio-gpu-pci
+```
