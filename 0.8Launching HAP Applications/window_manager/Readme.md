@@ -14,30 +14,50 @@
 # Сборка
 Для сборки используйте команду `./make.sh --reload window_manager` в контейнере. Перед сборкой примените патч [0001-pip-abc-relative-source-path.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/window_window_manager/0001-pip-abc-relative-source-path.patch)
 
-# Проверка в QEMU
+---
 
-GPT-диск для QEMU:
-```bash
-cd /mnt/ohos/OpenHarmony7/out/oneir
-R=ohos-root.img; U=userdata.img; D=/tmp/oneir-gpt.img
-RM=$(( ($(stat -c %s $R) + 1048575) / 1048576 ))
-UM=$(( ($(stat -c %s $U) + 1048575) / 1048576 ))
-rm -f $D && truncate -s $(( RM + UM + 2 ))M $D
-/usr/sbin/sgdisk -o -n 1:1M:+${RM}M -c 1:system -n 2:0:+${UM}M -c 2:userdata $D
-dd if=$R of=$D bs=1M seek=1 conv=notrunc status=none
-dd if=$U of=$D bs=1M seek=$(( 1 + RM )) conv=notrunc status=none
-```
-Диск собирается из чистого userdata.img, так что аккаунт 100 будет создан заново.
+# Ограничение: в QEMU окна не проверить
 
-Запуск:
-```bash
-cd /mnt/ohos/OpenHarmony7
-sudo qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G -machine q35 \
-  -kernel out/kernel/OBJ/linux-6.6/arch/x86/boot/bzImage \
-  -drive file=/tmp/oneir-gpt.img,format=raw,if=none,id=nvm \
-  -device nvme,serial=oneir,drive=nvm \
-  -netdev user,id=n0,hostfwd=tcp:127.0.0.1:18710-:8710 \
-  -device e1000,netdev=n0 \
-  -append 'root=/dev/nvme0n1p1 rw console=ttyS0 selinux=0 hardware=x86_64_oneir init=/system/bin/init loglevel=4 bbox_ramoops=auto panic=5' \
-  -nographic -device virtio-gpu-pci
-```
+В QEMU оконную подсистему можно запустить, но довести её до работающего экрана нельзя.
+Проверять `window_manager` вместе с отрисовкой нужно на реальном железе с GPU Intel.
+
+## Почему
+
+1. **`window_manager` впервые заставляет RS рисовать экран через GPU.** `ScreenSessionManager`
+   (SA 4607, режим SceneBoard) при старте создаёт для физического экрана узел дисплея и включает
+   его. После этого `RSUniRenderThread` делает GPU-композицию экрана: берёт буфер поверхности экрана
+   (линейный DMA-BUF от `display_buffer`) и импортирует его в Vulkan
+   (`MakeFromNativeWindowBuffer` → `vkGetNativeBufferPropertiesOHOS`). Без службы экранов RS этот путь
+   не проходит, поэтому до появления `window_manager` в QEMU всё работало.
+
+2. **В образе есть Vulkan-драйвер только для Intel.** Единственный ICD —
+   `/vendor/lib64/libvulkan_intel.so` (`anv` из `third_party/mesa3d`). Расширения OpenHarmony
+   (`VK_OHOS_native_buffer`, `VK_OHOS_external_memory`) в нём реализованы (`anv_ohos.c`,
+   `vk_ohos.c`), но драйвер работает только с реальным GPU Intel. В QEMU у гостя только `virtio-gpu`,
+   поэтому физических устройств Vulkan нет, устройство не создаётся, и все функции устройства,
+   включая расширения OpenHarmony, остаются `NULL`.
+
+3. **RS в ветке 7.0 этого не проверяет** и вызывает функцию расширения по нулевому указателю.
+
+## Как это выглядит в QEMU
+
+Без патча `0003-vulkan-check-ohos-extension-functions.patch` (`graphic_2d`):
+
+- через ~140 мс после старта SA 4607 `render_service` падает с SIGSEGV в потоке `RSUniRenderThread`
+  (`fault address: 0x0`);
+- init по правилам RS останавливает `composer_host`, `allocator_host` и `foundation` и откладывает
+  их перезапуск на 240 с;
+- перезапущенный RS без composer через ~20 с выходит, и из-за `critical` у `render_service`
+  стенд перезагружается по кругу (`ExecReboot panic`, логи в `/data/log/bbox/*/last_kmsg`).
+
+С патчем RS не падает, в `hilog` появляется
+`vkGetNativeBufferPropertiesOHOS is not available`, но экран через GPU не рисуется.
+
+## Что можно проверить в QEMU
+
+- что службы стартуют: в `hidumper -ls` есть `RenderService`, `DisplayManagerService` (4607),
+  а `foundation` и RS работают одновременно;
+- что в `foundation` загружены `libwms.z.so` и `libscreen_session_manager.z.so`;
+- что `ScreenSessionManager` записал параметры экрана (`param get persist.window.screen.width`).
+
+Отрисовку экрана и окон в QEMU проверить нельзя.
