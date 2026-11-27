@@ -13,3 +13,17 @@
 
 # Сборка
 Для сборки используйте команду `./make.sh --reload window_manager` в контейнере. Перед сборкой примените патч [0001-pip-abc-relative-source-path.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/window_window_manager/0001-pip-abc-relative-source-path.patch)
+
+# Проверка в QEMU
+
+GPT-диск для QEMU:
+```bash
+cd /mnt/ohos/OpenHarmony7/out/oneir
+R=ohos-root.img; U=userdata.img; D=/tmp/oneir-gpt.img
+RM=$(( ($(stat -c %s $R) + 1048575) / 1048576 ))
+UM=$(( ($(stat -c %s $U) + 1048575) / 1048576 ))
+rm -f $D && truncate -s $(( RM + UM + 2 ))M $D
+/usr/sbin/sgdisk -o -n 1:1M:+${RM}M -c 1:system -n 2:0:+${UM}M -c 2:userdata $D
+dd if=$R of=$D bs=1M seek=1 conv=notrunc status=none
+dd if=$U of=$D bs=1M seek=$(( 1 + RM )) conv=notrunc status=none
+```
