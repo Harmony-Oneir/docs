@@ -4,6 +4,9 @@
 ```
 ./make.sh oneir_graphics
 ```
+
+Перед сборкой примените патч [0003-vulkan-check-ohos-extension-functions.patch](https://github.com/Harmony-Oneir/oneir_patches/blob/main/graphics/0003-vulkan-check-ohos-extension-functions.patch).
+
 Поумолчанию RS работает в режиме OpenGL. Аргумент `graphic_2d_feature_enable_vulkan = true` переключает на Vulkan.
 Аргумент сборки `skia_use_vulkan` включает Vulkan-бэкенд в Skia. Аргумент `skia_vk_enable_partialrender` включает частичную перерисовку.
 
